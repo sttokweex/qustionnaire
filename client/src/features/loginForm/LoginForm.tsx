@@ -1,7 +1,6 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Context } from '../../app/main';
-
+import { useLoginMutation } from '../../shared/http';
 type FormData = {
   username: string;
   password: string;
@@ -9,14 +8,21 @@ type FormData = {
 
 const LoginForm: FC = () => {
   const { register, handleSubmit } = useForm<FormData>();
-  const { store } = useContext(Context);
-
+  const mutation = useLoginMutation();
   const onSubmit: SubmitHandler<FormData> = (data) => {
     const formData = {
       username: data.username,
       password: data.password,
     };
-    store.login(formData.username, formData.password);
+    mutation.mutate(formData, {
+      onSuccess: (response) => {
+        localStorage.setItem('token', response.accessToken);
+        console.log('Ответ сервера:', response);
+      },
+      onError: (error) => {
+        console.error('Ошибка сервера:', error);
+      },
+    });
   };
 
   return (
