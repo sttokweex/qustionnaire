@@ -4,12 +4,13 @@ import Token from '../models/token.js';
 class TokenService {
   generateTokens(payload) {
     const accessToken = jwt.sign(payload, secret.access_secret, {
-      expiresIn: '10m',
+      expiresIn: '30m',
     });
     const refreshToken = jwt.sign(payload, secret.refresh_secret, {
       expiresIn: '30d',
     });
-    return { accessToken, refreshToken };
+    const expirationTime = Math.floor(Date.now() / 1000) + 30 * 60;
+    return { accessToken, refreshToken, expirationTime };
   }
   validateAccessToken(token) {
     try {

@@ -13,22 +13,22 @@ const useLoginMutation = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token') as string}`,
       },
       body: JSON.stringify(data),
+      credentials: 'include', // Добавление автоматической отправки куки
     }).then((res) => res.json());
   });
 };
 
 const useRegistrationMutation = () => {
-  return useMutation((data) => {
+  return useMutation((data: LoginData) => {
     return fetch(`${API_URL}/registration`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(data),
+      credentials: 'include', // Добавление автоматической отправки куки
     }).then((res) => res.json());
   });
 };
@@ -37,11 +37,24 @@ const useLogoutMutation = () => {
   return useMutation(() => {
     return fetch(`${API_URL}/logout`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: {},
+      credentials: 'include', // Добавление автоматической отправки куки
     });
   });
 };
 
-export { useLoginMutation, useRegistrationMutation, useLogoutMutation };
+const useRefreshTokenMutation = () => {
+  return useMutation(() => {
+    return fetch(`${API_URL}/refresh`, {
+      method: 'GET',
+      credentials: 'include', // Добавление автоматической отправки куки
+    }).then((res) => res.json());
+  });
+};
+
+export {
+  useLoginMutation,
+  useRegistrationMutation,
+  useLogoutMutation,
+  useRefreshTokenMutation,
+};

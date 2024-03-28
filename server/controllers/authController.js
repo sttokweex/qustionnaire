@@ -12,7 +12,7 @@ class authController {
       }
       const candidate = await User.findOne({ where: { username: username } });
       if (candidate) {
-        return reply.code(400).send(`unluck ${candidate.username} уже есть`);
+        return reply.code(400).send('unluck');
       }
       const hashPassword = bcrypt.hashSync(password, 8);
       const user = await User.create({
@@ -32,6 +32,11 @@ class authController {
       });
       return {
         ...tokens,
+        user: {
+          id: user.id,
+          role: user.role,
+          username: user.username,
+        },
       };
     } catch (e) {
       console.log(e);
@@ -91,12 +96,15 @@ class authController {
     try {
       const { refreshToken } = request.cookies;
       if (!refreshToken) {
-        return reply.code(403).send({ message: 'Пользователь не авторизован' });
+        return reply
+          .code(401)
+          .send({ message: 'Пользователь не авторизован1111111' });
       }
       const userData = tokenService.validateRefreshToken(refreshToken);
       const tokenFromDb = await tokenService.findToken(refreshToken);
       if (!userData || !tokenFromDb) {
-        return reply.code(403).send({ message: 'Пользователь не авторизован' });
+        console.log(userData, tokenFromDb, refreshToken);
+        return reply.code(401).send({ message: 'Пользователь не авторизован' });
       }
       const user = await User.findOne({ where: { id: userData.id } });
       const tokens = tokenService.generateTokens({
@@ -104,6 +112,7 @@ class authController {
         role: user.role,
         username: user.username,
       });
+
       await tokenService.saveToken(user.id, tokens.refreshToken);
       reply.setCookie('refreshToken', tokens.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -111,6 +120,11 @@ class authController {
       });
       return {
         ...tokens,
+        user: {
+          id: user.id,
+          role: user.role,
+          username: user.username,
+        },
       };
     } catch (e) {
       reply.code(400).send(e);

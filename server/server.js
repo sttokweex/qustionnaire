@@ -8,11 +8,11 @@ const app = fastify();
 (async () => {
   await sequelize.sync({});
   app.register(fastifyCors, {
-    origin: 'http://localhost:5173', // specify the origin
+    origin: 'http://localhost:5173',
     credentials: true,
   });
   app.register(fastifyCookie, {
-    secret: 'your-secret-key', // Обязательно, используется для подписи cookie
+    secret: 'your-secret-key',
   });
 
   app.register(routes);
