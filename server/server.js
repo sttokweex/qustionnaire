@@ -3,10 +3,12 @@ import routes from './router/routes.js';
 import sequelize from './router/db-connector.js';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
+
 const app = fastify();
 
 (async () => {
   await sequelize.sync({});
+
   app.register(fastifyCors, {
     origin: 'http://localhost:5173',
     credentials: true,

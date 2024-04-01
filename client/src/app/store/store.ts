@@ -3,6 +3,7 @@ import { useLoginMutation } from '../../shared/http';
 import { useRegistrationMutation } from '../../shared/http';
 import { useLogoutMutation } from '../../shared/http';
 import { useRefreshTokenMutation } from '../../shared/http';
+
 interface IUser {
   id: number;
   role: string;
@@ -43,10 +44,12 @@ export default class Store {
 
       mutation.mutate(formData, {
         onSuccess: (response) => {
-          localStorage.setItem('expirationTime', response.expirationTime);
-          localStorage.setItem('token', response.accessToken);
-          this.setAuth(true);
-          this.setUser(response.user);
+          if (response.user) {
+            localStorage.setItem('expirationTime', response.expirationTime);
+            localStorage.setItem('token', response.accessToken);
+            this.setAuth(true);
+            this.setUser(response.user);
+          }
           console.log('Ответ сервера:', response);
         },
         onError: (error) => {
@@ -71,10 +74,12 @@ export default class Store {
 
       mutation.mutate(formData, {
         onSuccess: (response) => {
-          localStorage.setItem('expirationTime', response.expirationTime);
-          localStorage.setItem('token', response.accessToken);
-          this.setAuth(true);
-          this.setUser(response.user);
+          if (response.user) {
+            localStorage.setItem('expirationTime', response.expirationTime);
+            localStorage.setItem('token', response.accessToken);
+            this.setAuth(true);
+            this.setUser(response.user);
+          }
           console.log('Ответ сервера:', response);
         },
         onError: (error) => {

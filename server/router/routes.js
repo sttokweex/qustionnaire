@@ -2,6 +2,12 @@ import User from '../models/user.js';
 
 import authController from '../controllers/authController.js';
 import authMiddlewaree from '../middlewaree/auth-middlewaree.js';
+import Employe from './../models/for-vki/emploey.js';
+import GetRole from '../models/for-vki/get_role.js';
+import GetPermissions from '../models/for-vki/get_permissions.js';
+import GetPurpose from '../models/for-vki/get_purpose.js';
+import Timeof from '../models/for-vki/timeof.js';
+import Ban from '../models/for-vki/ban.js';
 
 const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
@@ -18,7 +24,20 @@ const routes = async (fastify) => {
       return users;
     },
   );
-
+  fastify.get('/employe', async () => {
+    const Employees = await Employe.findAll();
+    return Employees;
+  });
+  fastify.get('/employe/:id', async (request) => {
+    const id = request.params.id;
+    const role = await GetRole.findAll({ where: { user_id: id } });
+    const permission = await GetPermissions.findAll({ where: { user_id: id } });
+    const purpose = await GetPurpose.findAll({ where: { user_id: id } });
+    const timeof = await Timeof.findAll({ where: { user_id: id } });
+    const employe = await Employe.findOne({ where: { id: id } });
+    const ban = await Ban.findAll({ where: { id: id } });
+    return { employe, role, permission, purpose, timeof, ban };
+  });
   fastify.get('/user/:id', async (request) => {
     const users = await User.findAll();
     const id = request.params.id;
