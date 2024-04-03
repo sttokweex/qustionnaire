@@ -4,3 +4,7 @@
 p {
   padding: 2px;
 }
+input {
+  border-width: 1px;
+  padding: 8px;
+}

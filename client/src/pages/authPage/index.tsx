@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import LoginForm from '../../features/loginForm/LoginForm';
-import RegisterForm from '../../features/registerForm/registerForm';
-import { observer } from 'mobx-react-lite';
+import LoginForm from '../../features/auth/loginForm/LoginForm';
+import RegisterForm from '../../features/auth/registerForm/registerForm';
 const AuthPage: React.FC = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -35,4 +34,4 @@ const AuthPage: React.FC = () => {
   );
 };
 
-export default observer(AuthPage);
+export default AuthPage;

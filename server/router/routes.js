@@ -13,7 +13,20 @@ const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
   fastify.post('/login', authController.login);
   fastify.post('/logout', authController.logout);
+
   fastify.get('/refresh', authController.refresh);
+  fastify.post('/update', async (request, reply) => {
+    try {
+      const { id, newData } = request.body; // Получение идентификатора и новых данных из запроса
+      await Employe.update(newData, { where: { id: id } }); // Здесь YourModel - ваша модель Sequelize
+      reply.send({ success: true, message: 'Данные успешно обновлены' });
+    } catch (error) {
+      reply.status(500).send({
+        success: false,
+        message: 'Произошла ошибка при обновлении данных',
+      });
+    }
+  });
   fastify.get(
     '/users',
     {

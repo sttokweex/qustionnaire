@@ -9,22 +9,44 @@ interface IUser {
   role: string;
   username: string;
 }
+interface IEmployee {
+  id: number;
+  initials: string;
+  gender: string;
+  birth_data: string;
+  indetificator: string;
+  phone: string;
+  email: string;
+  additional_info: string;
+  snils: string;
+}
 
 export default class Store {
   user = {} as IUser;
   isAuth = false;
-  isLoading = false;
+  isLoading = true;
+  employee = {} as IEmployee;
 
   constructor() {
     makeAutoObservable(this);
+    this.loadFromLocalStorage();
   }
-
+  loadFromLocalStorage() {
+    const storedEmployee = localStorage.getItem('employee');
+    if (storedEmployee) {
+      this.setEmployee(JSON.parse(storedEmployee));
+    }
+  }
   setAuth(bool: boolean) {
     this.isAuth = bool;
   }
 
   setUser(user: IUser) {
     this.user = user;
+  }
+  setEmployee(employee: IEmployee) {
+    this.employee = employee;
+    localStorage.setItem('employee', JSON.stringify(employee));
   }
 
   setLoading(bool: boolean) {
@@ -104,7 +126,8 @@ export default class Store {
 
   async checkAuth(mutation: ReturnType<typeof useRefreshTokenMutation>) {
     try {
-      const response = await mutation.mutateAsync(); // Await the result of the Promise
+      const response = await mutation.mutateAsync(); // Используем mutateAsync() для получения промисса с результатом выполнения мутации
+
       if (!response.user) {
         this.setAuth(false);
       } else {

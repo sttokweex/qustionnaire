@@ -1,6 +1,9 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useContext } from 'react';
 import { useGetEmployees } from '../../shared/http';
 import { useNavigate } from 'react-router-dom';
+import { Context } from '../../app/main';
+import { observer } from 'mobx-react-lite';
+
 interface Employee {
   id: number;
   initials: string;
@@ -14,17 +17,13 @@ interface Employee {
 }
 const EmployeesList: FC = () => {
   const history = useNavigate();
-
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null,
-  );
-
+  const { store } = useContext(Context);
   const employeesQuery = useGetEmployees();
   useEffect(() => {
     employeesQuery.refetch();
   }, []);
   const handleEmployeeClick = (employee: Employee) => {
-    setSelectedEmployee(employee);
+    store.setEmployee(employee);
     history(`/employee/${employee.id}`);
   };
 
@@ -64,13 +63,8 @@ const EmployeesList: FC = () => {
           <p>{employee.snils}</p>
         </div>
       ))}
-      {selectedEmployee && (
-        <div>
-          <p>Selected Employee: {selectedEmployee.id}</p>
-        </div>
-      )}
     </>
   );
 };
 
-export default EmployeesList;
+export default observer(EmployeesList);

@@ -2,6 +2,7 @@ import { FC, useContext } from 'react';
 import DataButton from '../../features/dataButton/dataButton';
 import { Context } from '../../app/main';
 import { useLogoutMutation } from '../../shared/http';
+import { observer } from 'mobx-react-lite';
 const MainPage: FC = () => {
   const mutation = useLogoutMutation();
   const { store } = useContext(Context);
@@ -19,9 +20,8 @@ const MainPage: FC = () => {
           выход
         </button>
       </div>
-
       <DataButton />
     </>
   );
 };
-export default MainPage;
+export default observer(MainPage);
