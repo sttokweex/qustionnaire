@@ -20,7 +20,12 @@ interface IEmployee {
   additional_info: string;
   snils: string;
 }
-
+interface IResponse {
+  accessToken: string;
+  expirationTime: string;
+  refreshToken: string;
+  user: IUser;
+}
 export default class Store {
   user = {} as IUser;
   isAuth = false;
@@ -65,14 +70,13 @@ export default class Store {
       };
 
       mutation.mutate(formData, {
-        onSuccess: (response) => {
+        onSuccess: (response: IResponse) => {
           if (response.user) {
             localStorage.setItem('expirationTime', response.expirationTime);
             localStorage.setItem('token', response.accessToken);
             this.setAuth(true);
             this.setUser(response.user);
           }
-          console.log('Ответ сервера:', response);
         },
         onError: (error) => {
           console.error('Ошибка сервера:', error);
@@ -102,7 +106,6 @@ export default class Store {
             this.setAuth(true);
             this.setUser(response.user);
           }
-          console.log('Ответ сервера:', response);
         },
         onError: (error) => {
           console.error('Ошибка сервера:', error);
@@ -132,7 +135,7 @@ export default class Store {
         this.setAuth(false);
       } else {
         this.setLoading(true);
-        console.log(response);
+
         localStorage.setItem('token', response.accessToken);
         this.setAuth(true);
         this.setUser(response.user);

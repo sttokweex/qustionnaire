@@ -89,7 +89,7 @@ class authController {
       reply.clearCookie('refreshToken');
       return { token };
     } catch (e) {
-      reply.code(400).send(e);
+      throw ApiError.BadRequest('logout error');
     }
   }
   async refresh(request, reply) {

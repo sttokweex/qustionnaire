@@ -44,7 +44,6 @@ const EditPersonalData: FC = () => {
   };
 
   const handleUpdate = () => {
-    console.log(formData);
     store.setEmployee(formData);
     mutation.mutate(formData);
   };
