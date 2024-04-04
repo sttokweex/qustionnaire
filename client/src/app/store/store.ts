@@ -31,7 +31,7 @@ export default class Store {
     makeAutoObservable(this);
     this.loadFromLocalStorage();
   }
-  loadFromLocalStorage() {
+  async loadFromLocalStorage() {
     const storedEmployee = localStorage.getItem('employee');
     if (storedEmployee) {
       this.setEmployee(JSON.parse(storedEmployee));
@@ -45,8 +45,8 @@ export default class Store {
     this.user = user;
   }
   setEmployee(employee: IEmployee) {
-    this.employee = employee;
     localStorage.setItem('employee', JSON.stringify(employee));
+    this.employee = employee;
   }
 
   setLoading(bool: boolean) {

@@ -28,7 +28,7 @@ const EditPersonalData: FC = () => {
     additional_info: store.employee.additional_info,
     snils: store.employee.snils,
   });
-  console.log(formData);
+
   const mutation = useMutation((updatedData: IEmployee) => {
     return fetch('http://localhost:3000/update', {
       method: 'POST',
@@ -44,8 +44,9 @@ const EditPersonalData: FC = () => {
   };
 
   const handleUpdate = () => {
+    console.log(formData);
+    store.setEmployee(formData);
     mutation.mutate(formData);
-    store.employee = formData;
   };
 
   return (

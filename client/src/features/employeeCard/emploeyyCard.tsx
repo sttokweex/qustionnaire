@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetEmployee } from '../../shared/http';
+import { observer } from 'mobx-react-lite';
 interface purpose {
   id: number;
   user_id: number;
@@ -228,4 +229,4 @@ const EmployeeCard: FC = () => {
     return <h1>Loading...</h1>;
   }
 };
-export default EmployeeCard;
+export default observer(EmployeeCard);
