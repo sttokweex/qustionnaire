@@ -114,7 +114,12 @@ const EditPersonalData: FC = () => {
             value={formData.email}
             onChange={handleChange}
           />
-          <button onClick={handleUpdate}>Обновить</button>{' '}
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold w-1/3 py-2 px-4 rounded mx-auto"
+            onClick={handleUpdate}
+          >
+            Обновить
+          </button>{' '}
         </div>
       </div>
     </div>
