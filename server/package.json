@@ -13,8 +13,10 @@
   },
   "type": "module",
   "devDependencies": {
+    "@conarti/eslint-plugin-feature-sliced": "^1.0.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.1.3",
     "prettier": "3.2.5"
   }

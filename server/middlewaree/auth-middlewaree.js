@@ -17,7 +17,6 @@ export default async (req, res, next) => {
     req.user = userData;
     next();
   } catch (e) {
-    console.log(e);
     throw ApiError.UnauthorizedError();
   }
 };

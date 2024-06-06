@@ -2,6 +2,7 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import tokenService from '../service/token-service.js';
 import ApiError from '../exceptions/api-error.js';
+import Employe from '../models/for-vki/emploey.js';
 
 class authController {
   async registration(request, reply) {
@@ -90,6 +91,25 @@ class authController {
       return { token };
     } catch (e) {
       throw ApiError.BadRequest('logout error');
+    }
+  }
+  async archive(request) {
+    try {
+      const { employees } = request.body;
+      if (employees.length == 0) {
+        throw ApiError.BadRequest('нет пользователей');
+      }
+      Employe.update(
+        { archive: false },
+        {
+          where: {
+            id: employees,
+          },
+        },
+      );
+      return 'Данные успешно обновлены';
+    } catch (e) {
+      throw ApiError.BadRequest('Ошибка при обновлении данных');
     }
   }
   async refresh(request, reply) {

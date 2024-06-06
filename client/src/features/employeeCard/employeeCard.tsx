@@ -1,7 +1,8 @@
+import { observer } from 'mobx-react-lite';
 import { FC, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetEmployee } from '../../shared/http';
-import { observer } from 'mobx-react-lite';
+import { useGetEmployee } from 'shared/http';
+
 interface purpose {
   id: number;
   user_id: number;

@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react-lite';
 import { FC, useContext, useEffect } from 'react';
 import {
   Route,
@@ -5,14 +6,13 @@ import {
   Routes,
   Navigate,
 } from 'react-router-dom';
-import { useRefreshTokenMutation } from '../shared/http';
+import AuthPage from 'pages/authPage';
+import MainPage from 'pages/mainPage';
+import EditPersonalData from 'features/editPersonalData/editPersonalData';
+import EmployeeCard from 'features/employeeCard/employeeCard';
+import EmployeesList from 'features/employeesList/employeesList';
+import { useRefreshTokenMutation } from 'shared/http';
 import { Context } from './main';
-import AuthPage from '../pages/authPage';
-import MainPage from '../pages/mainPage';
-import EmployeesList from '../features/employeesList/employeesList';
-import EmployeeCard from '../features/employeeCard/emploeyyCard';
-import EditPersonalData from '../features/editPersonalData/editPersonalData';
-import { observer } from 'mobx-react-lite';
 
 const App: FC = () => {
   const mutationRefresh = useRefreshTokenMutation();

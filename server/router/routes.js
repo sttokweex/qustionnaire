@@ -13,7 +13,7 @@ const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
   fastify.post('/login', authController.login);
   fastify.post('/logout', authController.logout);
-
+  fastify.put('/archive', authController.archive)
   fastify.get('/refresh', authController.refresh);
   fastify.post('/update', async (request, reply) => {
     try {

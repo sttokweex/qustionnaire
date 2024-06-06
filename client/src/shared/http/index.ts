@@ -1,5 +1,10 @@
-import { useMutation, useQuery } from 'react-query';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
+import {
+  useMutation,
+  useQuery,
+  UseMutationResult,
+  UseQueryResult,
+} from 'react-query';
 
 const API_URL: string = 'http://localhost:3000';
 
@@ -7,6 +12,7 @@ interface LoginData {
   username: string;
   password: string;
 }
+
 interface Employee {
   id: number;
   initials: string;
@@ -18,45 +24,66 @@ interface Employee {
   additional_info: string;
   snils: string;
 }
-const useLoginMutation = () => {
-  return useMutation((data: LoginData) => {
+
+const useLoginMutation = (): UseMutationResult<
+  any,
+  unknown,
+  LoginData,
+  unknown
+> => {
+  return useMutation((data: LoginData): Promise<any> => {
     return axios
       .post(`${API_URL}/login`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
-        withCredentials: true, // Automatically send cookies
+        withCredentials: true,
       })
       .then((res) => res.data);
   });
 };
 
-const useRegistrationMutation = () => {
-  return useMutation((data: LoginData) => {
+const useRegistrationMutation = (): UseMutationResult<
+  any,
+  unknown,
+  LoginData,
+  unknown
+> => {
+  return useMutation((data: LoginData): Promise<any> => {
     return axios
       .post(`${API_URL}/registration`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
-        withCredentials: true, // Automatically send cookies
+        withCredentials: true,
       })
       .then((res) => res.data);
   });
 };
 
-const useLogoutMutation = () => {
-  return useMutation(() => {
+const useLogoutMutation = (): UseMutationResult<
+  any,
+  unknown,
+  void,
+  unknown
+> => {
+  return useMutation((): Promise<any> => {
     return axios.post(`${API_URL}/logout`, null, {
       headers: {
-        'Content-Type': 'application/json', // Set the Content-Type header
+        'Content-Type': 'application/json',
       },
-      withCredentials: true, // Automatically send cookies
+      withCredentials: true,
     });
   });
 };
 
-const useRefreshTokenMutation = () => {
-  return useMutation(() => {
+const useRefreshTokenMutation = (): UseMutationResult<
+  any,
+  unknown,
+  void,
+  unknown
+> => {
+  return useMutation((): Promise<any> => {
     return axios
       .get(`${API_URL}/refresh`, {
         withCredentials: true,
@@ -64,11 +91,13 @@ const useRefreshTokenMutation = () => {
       .then((res) => res.data);
   });
 };
-const token = localStorage.getItem('token');
-const useGetEmployees = () => {
+
+const token: string | null = localStorage.getItem('token');
+
+const useGetEmployees = (): UseQueryResult<Employee[], unknown> => {
   return useQuery<Employee[]>(
     'employees',
-    async () => {
+    async (): Promise<Employee[]> => {
       return axios
         .get(`${API_URL}/employe`, {
           headers: {
@@ -82,10 +111,13 @@ const useGetEmployees = () => {
     },
   );
 };
-const useGetEmployee = (id: string | undefined) => {
+
+const useGetEmployee = (
+  id: string | undefined,
+): UseQueryResult<any, unknown> => {
   return useQuery(
     `employe_${id}`,
-    () => {
+    (): Promise<any> => {
       return axios
         .get(`${API_URL}/employe/${id}`, {
           headers: {

@@ -1,8 +1,8 @@
-import { FC, useEffect, useContext } from 'react';
-import { useGetEmployees } from '../../shared/http';
-import { useNavigate } from 'react-router-dom';
-import { Context } from '../../app/main';
 import { observer } from 'mobx-react-lite';
+import { FC, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Context } from 'app/main';
+import { useGetEmployees } from 'shared/http';
 
 interface Employee {
   id: number;
@@ -18,6 +18,7 @@ interface Employee {
 const EmployeesList: FC = () => {
   const history = useNavigate();
   const { store } = useContext(Context);
+
   const employeesQuery = useGetEmployees();
   useEffect(() => {
     employeesQuery.refetch();
