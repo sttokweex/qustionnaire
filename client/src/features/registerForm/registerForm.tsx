@@ -1,9 +1,7 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useRegistrationMutation } from '../../shared/http';
+import { useRegistrationMutation } from '@/shared/http';
 
-import { Context } from '../../app/main';
-import { observer } from 'mobx-react-lite';
 type FormData = {
   username: string;
   password: string;
@@ -14,12 +12,11 @@ type RegisterFormProps = {
 };
 
 const RegisterForm: FC<RegisterFormProps> = ({ setShowForm }) => {
-  const { store } = useContext(Context);
   const { register, handleSubmit } = useForm<FormData>();
   const mutation = useRegistrationMutation();
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    store.registration(data.username, data.password, mutation);
+    mutation.mutate(data);
   };
 
   return (
@@ -29,7 +26,6 @@ const RegisterForm: FC<RegisterFormProps> = ({ setShowForm }) => {
       <button className="float-right" onClick={() => setShowForm(false)}>
         ✕
       </button>{' '}
-      {/* Кнопка закрытия */}
       <form onSubmit={handleSubmit(onSubmit)} className="w-64 mx-auto">
         <div className="flex flex-col space-y-4">
           <input
@@ -55,4 +51,4 @@ const RegisterForm: FC<RegisterFormProps> = ({ setShowForm }) => {
   );
 };
 
-export default observer(RegisterForm);
+export default RegisterForm;

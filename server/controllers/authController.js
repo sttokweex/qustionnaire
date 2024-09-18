@@ -1,18 +1,20 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import tokenService from '../service/token-service.js';
+import ApiError from '../exceptions/api-error.js';
+
 class authController {
   async registration(request, reply) {
     try {
       const { username, password } = request.body;
       if (password.length < 5 || password.length > 10) {
-        return reply
-          .code(400)
-          .send('Password must be between 5 and 10 characters');
+        throw ApiError.BadRequest(
+          'Пароль должен быть больше 5 символов и меньше 10',
+        );
       }
       const candidate = await User.findOne({ where: { username: username } });
       if (candidate) {
-        return reply.code(400).send('unluck');
+        throw ApiError.BadRequest('Пользователь уже существует');
       }
       const hashPassword = bcrypt.hashSync(password, 8);
       const user = await User.create({
@@ -40,21 +42,23 @@ class authController {
       };
     } catch (e) {
       console.log(e);
+      reply.status(e.status || 500).send({
+        message: e.message || 'Ошибка регистрации',
+      });
     }
   }
+
   async login(request, reply) {
     try {
       const { username, password } = request.body;
       const user = await User.findOne({ where: { username: username } });
       if (!user) {
-        return reply
-          .code(400)
-          .send({ message: `Пользователь ${username} не найден` });
+        throw ApiError.BadRequest('Пользователь не найден');
       }
 
       const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
-        return reply.code(400).send({ message: `Введен неверный пароль` });
+        throw ApiError.BadRequest('Введен неверный пароль');
       }
       const tokens = tokenService.generateTokens({
         id: user.id,
@@ -63,7 +67,6 @@ class authController {
       });
 
       await tokenService.saveToken(user.id, tokens.refreshToken);
-
       reply.setCookie('refreshToken', tokens.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -79,9 +82,12 @@ class authController {
       };
     } catch (e) {
       console.log(e);
-      reply.code(400).send({ message: 'Login error' });
+      reply.status(e.status || 500).send({
+        message: e.message || 'Ошибка входа',
+      });
     }
   }
+
   async logout(request, reply) {
     try {
       const { refreshToken } = request.cookies;
@@ -89,22 +95,21 @@ class authController {
       reply.clearCookie('refreshToken');
       return { token };
     } catch (e) {
-      reply.code(400).send(e);
+      console.log(e);
+      reply.status(400).send({ message: 'Ошибка выхода' });
     }
   }
+
   async refresh(request, reply) {
     try {
       const { refreshToken } = request.cookies;
       if (!refreshToken) {
-        return reply
-          .code(401)
-          .send({ message: 'Пользователь не авторизован1111111' });
+        throw ApiError.UnauthorizedError('Не авторизован');
       }
       const userData = tokenService.validateRefreshToken(refreshToken);
       const tokenFromDb = await tokenService.findToken(refreshToken);
       if (!userData || !tokenFromDb) {
-        console.log(userData, tokenFromDb, refreshToken);
-        return reply.code(401).send({ message: 'Пользователь не авторизован' });
+        throw ApiError.UnauthorizedError('Не авторизован');
       }
       const user = await User.findOne({ where: { id: userData.id } });
       const tokens = tokenService.generateTokens({
@@ -127,8 +132,12 @@ class authController {
         },
       };
     } catch (e) {
-      reply.code(400).send(e);
+      console.log(e);
+      reply.status(e.status || 500).send({
+        message: e.message || 'Ошибка обновления токена',
+      });
     }
   }
 }
+
 export default new authController();

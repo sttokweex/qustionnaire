@@ -1,8 +1,6 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Context } from '../../app/main';
-import { useLoginMutation } from '../../shared/http';
-import { observer } from 'mobx-react-lite';
+import { useLoginMutation } from '@/shared/http';
 
 type FormData = {
   username: string;
@@ -10,18 +8,13 @@ type FormData = {
 };
 
 type LoginFormProps = {
-  setShowForm: (show: boolean) => void; // Принимаем функцию состояния извне
+  setShowForm: (show: boolean) => void;
 };
 const LoginForm: FC<LoginFormProps> = ({ setShowForm }) => {
   const { register, handleSubmit } = useForm<FormData>();
-  const { store } = useContext(Context);
   const mutation = useLoginMutation();
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    const formData = {
-      username: data.username,
-      password: data.password,
-    };
-    store.login(formData.username, formData.password, mutation);
+    mutation.mutate(data);
   };
 
   return (
@@ -53,4 +46,4 @@ const LoginForm: FC<LoginFormProps> = ({ setShowForm }) => {
     </div>
   );
 };
-export default observer(LoginForm);
+export default LoginForm;

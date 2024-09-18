@@ -1,5 +1,5 @@
-import { useMutation } from 'react-query';
-
+import axios from 'axios';
+import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 const API_URL: string = 'http://localhost:3000';
 
 interface LoginData {
@@ -7,49 +7,146 @@ interface LoginData {
   password: string;
 }
 
-const useLoginMutation = () => {
-  return useMutation((data: LoginData) => {
-    return fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+const useLoginMutation = (): UseMutationResult<
+  any,
+  unknown,
+  LoginData,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (data: LoginData): Promise<any> => {
+      const res = await axios.post(`${API_URL}/login`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      return res.data;
+    },
+    {
+      onSuccess: (response) => {
+        queryClient.setQueryData('user', response.user.username);
+        localStorage.setItem('user', response.user.username);
+        queryClient.setQueryData('token', {
+          token: response.accessToken,
+          exp: response.expirationTime,
+        });
+        localStorage.setItem(
+          'token',
+          JSON.stringify({
+            token: response.accessToken,
+
+            exp: response.expirationTime,
+          }),
+        );
+        queryClient.invalidateQueries;
+        console.log(queryClient.getQueryData('user'));
       },
-      body: JSON.stringify(data),
-      credentials: 'include', // Добавление автоматической отправки куки
-    }).then((res) => res.json());
-  });
+    },
+  );
 };
 
-const useRegistrationMutation = () => {
-  return useMutation((data: LoginData) => {
-    return fetch(`${API_URL}/registration`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+const useRegistrationMutation = (): UseMutationResult<
+  any,
+  unknown,
+  LoginData
+> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (data: LoginData): Promise<any> => {
+      const res = await axios.post(`${API_URL}/registration`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      return res.data;
+    },
+    {
+      onSuccess: (response) => {
+        queryClient.setQueryData('user', response.user.username);
+        localStorage.setItem('user', response.user.username);
+        queryClient.setQueryData('token', {
+          token: response.accessToken,
+          exp: response.expirationTime,
+        });
+        localStorage.setItem(
+          'token',
+          JSON.stringify({
+            token: response.accessToken,
+            exp: response.expirationTime,
+          }),
+        );
+        queryClient.invalidateQueries;
+        console.log(queryClient.getQueryData('user'));
       },
-      body: JSON.stringify(data),
-      credentials: 'include', // Добавление автоматической отправки куки
-    }).then((res) => res.json());
-  });
+    },
+  );
 };
 
-const useLogoutMutation = () => {
-  return useMutation(() => {
-    return fetch(`${API_URL}/logout`, {
-      method: 'POST',
-      headers: {},
-      credentials: 'include', // Добавление автоматической отправки куки
-    });
-  });
+const useLogoutMutation = (): UseMutationResult<
+  any,
+  unknown,
+  void,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (): Promise<any> => {
+      return axios.post(`${API_URL}/logout`, null, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.removeQueries('user');
+        queryClient.removeQueries('token');
+        localStorage.clear();
+      },
+    },
+  );
 };
 
-const useRefreshTokenMutation = () => {
-  return useMutation(() => {
-    return fetch(`${API_URL}/refresh`, {
-      method: 'GET',
-      credentials: 'include', // Добавление автоматической отправки куки
-    }).then((res) => res.json());
-  });
+const useRefreshTokenMutation = (): UseMutationResult<
+  any,
+  unknown,
+  void,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (): Promise<any> => {
+      return axios
+        .get(`${API_URL}/refresh`, {
+          withCredentials: true,
+        })
+        .then((res) => res.data);
+    },
+    {
+      onSuccess: (response) => {
+        queryClient.setQueryData('user', response.user.username);
+        localStorage.setItem('user', response.user.username);
+        queryClient.setQueryData('token', {
+          token: response.accessToken,
+          exp: response.expirationTime,
+        });
+        localStorage.setItem(
+          'token',
+          JSON.stringify({
+            token: response.accessToken,
+            exp: response.expirationTime,
+          }),
+        );
+        queryClient.invalidateQueries;
+        console.log(queryClient.getQueryData('token'));
+      },
+    },
+  );
 };
 
 export {

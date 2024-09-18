@@ -1,38 +1,44 @@
-import { FC, useContext, useEffect } from 'react';
-import AuthPage from '../pages/authPage';
+import { FC, useEffect } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
+import AuthPage from '@/pages/authPage';
+import { useLogoutMutation, useRefreshTokenMutation } from '@/shared/http';
 
-import { useLogoutMutation, useRefreshTokenMutation } from '../shared/http';
-import { Context } from './main';
-import { observer } from 'mobx-react-lite';
 const App: FC = () => {
+  const queryClient = useQueryClient();
   const mutation = useLogoutMutation();
   const mutationRefresh = useRefreshTokenMutation();
-  const { store } = useContext(Context);
+
   const handleLogout = () => {
-    store.logout(mutation);
+    mutation.mutate();
   };
+
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      store.checkAuth(mutationRefresh);
+    const token = localStorage.getItem('token');
+    if (token !== null) {
+      mutationRefresh.mutate();
+      queryClient.setQueryData('user', localStorage.getItem('user'));
+      queryClient.setQueryData('token', localStorage.getItem('token'));
     }
   }, []);
-  if (!store.isAuth) {
+  const { data: userData } = useQuery('user', () => {
+    return queryClient.getQueryData('user');
+  });
+  if (!userData) {
     return (
       <div>
         <AuthPage />
       </div>
     );
   }
+
   return (
     <div>
       <h1>
-        {store.isAuth
-          ? `Пользователь ${store.user.username} авторизован`
-          : 'АВТОРИЗУЙТЕСЬ'}
+        {userData ? `Пользователь ${userData} авторизован` : 'АВТОРИЗУЙТЕСЬ'}
         <button onClick={handleLogout}>выход</button>
       </h1>
     </div>
   );
 };
 
-export default observer(App);
+export default App;
