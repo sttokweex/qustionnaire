@@ -1,22 +1,70 @@
 import axios from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
-const API_URL: string = 'http://localhost:3000';
+import axiosInstance from '@/api/axiosInstance';
 
+const API_URL: string = 'http://localhost:3000';
 interface LoginData {
   username: string;
   password: string;
 }
 
+interface AuthResponse {
+  accessToken: string;
+  expirationTime: number;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+  };
+}
+const useRefreshTokenMutation = (): UseMutationResult<
+  AuthResponse,
+  unknown,
+  void,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (): Promise<AuthResponse> => {
+      return axios
+        .get<AuthResponse>(`${API_URL}/refresh`, {
+          withCredentials: true,
+        })
+        .then((res) => res.data);
+    },
+    {
+      onSuccess: (response) => {
+        console.log(response.accessToken);
+        queryClient.setQueryData('user', response.user.username);
+        localStorage.setItem('user', response.user.username);
+        queryClient.setQueryData('token', {
+          token: response.accessToken,
+          exp: response.expirationTime,
+        });
+        localStorage.setItem(
+          'token',
+          JSON.stringify({
+            token: response.accessToken,
+            exp: response.expirationTime,
+          }),
+        );
+        queryClient.invalidateQueries('token');
+        console.log(queryClient.getQueryData('token'));
+      },
+    },
+  );
+};
 const useLoginMutation = (): UseMutationResult<
-  any,
+  AuthResponse,
   unknown,
   LoginData,
   unknown
 > => {
   const queryClient = useQueryClient();
   return useMutation(
-    async (data: LoginData): Promise<any> => {
-      const res = await axios.post(`${API_URL}/login`, data, {
+    async (data: LoginData): Promise<AuthResponse> => {
+      const res = await axiosInstance.post<AuthResponse>(`/login`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -36,11 +84,10 @@ const useLoginMutation = (): UseMutationResult<
           'token',
           JSON.stringify({
             token: response.accessToken,
-
             exp: response.expirationTime,
           }),
         );
-        queryClient.invalidateQueries;
+        queryClient.invalidateQueries('user');
         console.log(queryClient.getQueryData('user'));
       },
     },
@@ -48,19 +95,23 @@ const useLoginMutation = (): UseMutationResult<
 };
 
 const useRegistrationMutation = (): UseMutationResult<
-  any,
+  AuthResponse,
   unknown,
   LoginData
 > => {
   const queryClient = useQueryClient();
   return useMutation(
-    async (data: LoginData): Promise<any> => {
-      const res = await axios.post(`${API_URL}/registration`, data, {
-        headers: {
-          'Content-Type': 'application/json',
+    async (data: LoginData): Promise<AuthResponse> => {
+      const res = await axiosInstance.post<AuthResponse>(
+        `/registration`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
         },
-        withCredentials: true,
-      });
+      );
       return res.data;
     },
     {
@@ -78,7 +129,7 @@ const useRegistrationMutation = (): UseMutationResult<
             exp: response.expirationTime,
           }),
         );
-        queryClient.invalidateQueries;
+        queryClient.invalidateQueries('user');
         console.log(queryClient.getQueryData('user'));
       },
     },
@@ -86,15 +137,15 @@ const useRegistrationMutation = (): UseMutationResult<
 };
 
 const useLogoutMutation = (): UseMutationResult<
-  any,
+  void,
   unknown,
   void,
   unknown
 > => {
   const queryClient = useQueryClient();
   return useMutation(
-    (): Promise<any> => {
-      return axios.post(`${API_URL}/logout`, null, {
+    (): Promise<void> => {
+      return axiosInstance.post(`/logout`, null, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -106,44 +157,6 @@ const useLogoutMutation = (): UseMutationResult<
         queryClient.removeQueries('user');
         queryClient.removeQueries('token');
         localStorage.clear();
-      },
-    },
-  );
-};
-
-const useRefreshTokenMutation = (): UseMutationResult<
-  any,
-  unknown,
-  void,
-  unknown
-> => {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    (): Promise<any> => {
-      return axios
-        .get(`${API_URL}/refresh`, {
-          withCredentials: true,
-        })
-        .then((res) => res.data);
-    },
-    {
-      onSuccess: (response) => {
-        queryClient.setQueryData('user', response.user.username);
-        localStorage.setItem('user', response.user.username);
-        queryClient.setQueryData('token', {
-          token: response.accessToken,
-          exp: response.expirationTime,
-        });
-        localStorage.setItem(
-          'token',
-          JSON.stringify({
-            token: response.accessToken,
-            exp: response.expirationTime,
-          }),
-        );
-        queryClient.invalidateQueries;
-        console.log(queryClient.getQueryData('token'));
       },
     },
   );

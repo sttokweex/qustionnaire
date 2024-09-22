@@ -13,16 +13,18 @@ const App: FC = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token !== null) {
+    const tokenData = localStorage.getItem('token');
+    if (tokenData) {
       mutationRefresh.mutate();
       queryClient.setQueryData('user', localStorage.getItem('user'));
-      queryClient.setQueryData('token', localStorage.getItem('token'));
+      queryClient.setQueryData('token', tokenData);
     }
   }, []);
+
   const { data: userData } = useQuery('user', () => {
     return queryClient.getQueryData('user');
   });
+
   if (!userData) {
     return (
       <div>
@@ -34,7 +36,7 @@ const App: FC = () => {
   return (
     <div>
       <h1>
-        {userData ? `Пользователь ${userData} авторизован` : 'АВТОРИЗУЙТЕСЬ'}
+        {userData ? `Пользователь ${userData} авторизован ` : 'АВТОРИЗУЙТЕСЬ'}
         <button onClick={handleLogout}>выход</button>
       </h1>
     </div>

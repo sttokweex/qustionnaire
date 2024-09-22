@@ -2,6 +2,7 @@ import User from '../models/user.js';
 
 import authController from '../controllers/authController.js';
 import authMiddlewaree from '../middlewaree/auth-middlewaree.js';
+import ApiError from '../exceptions/api-error.js';
 
 const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
@@ -18,11 +19,12 @@ const routes = async (fastify) => {
       return users;
     },
   );
-
   fastify.get('/user/:id', async (request) => {
-    const users = await User.findAll();
     const id = request.params.id;
-    const user = users.find((user) => user.dataValues.id === +id);
+    const user = await User.findOne({ where: { id: +id } });
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден');
+    }
     return user;
   });
 

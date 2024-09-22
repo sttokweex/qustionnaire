@@ -2,7 +2,7 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import tokenService from '../service/token-service.js';
 import ApiError from '../exceptions/api-error.js';
-
+import secret from '../config.js';
 class authController {
   async registration(request, reply) {
     try {
@@ -29,7 +29,7 @@ class authController {
       });
       await tokenService.saveToken(user.id, tokens.refreshToken);
       reply.setCookie('refreshToken', tokens.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: secret.cookie_max_age,
         httpOnly: true,
       });
       return {
@@ -68,7 +68,7 @@ class authController {
 
       await tokenService.saveToken(user.id, tokens.refreshToken);
       reply.setCookie('refreshToken', tokens.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: secret.cookie_max_age,
         httpOnly: true,
       });
 
@@ -120,9 +120,10 @@ class authController {
 
       await tokenService.saveToken(user.id, tokens.refreshToken);
       reply.setCookie('refreshToken', tokens.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: secret.cookie_max_age,
         httpOnly: true,
       });
+
       return {
         ...tokens,
         user: {

@@ -8,8 +8,8 @@ const SurveyQuestions = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Survey, // Модель, с которой устанавливается связь
-        key: 'id', // Поле, на которое устанавливается связь
+        model: Survey,
+        key: 'id',
       },
     },
     question_text: {

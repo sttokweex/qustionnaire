@@ -7,8 +7,8 @@ const Token = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: User, // Модель, с которой устанавливается связь
-        key: 'id', // Поле, на которое устанавливается связь
+        model: User,
+        key: 'id',
       },
     },
     refresh: {
