@@ -1,13 +1,25 @@
 import axios from 'axios';
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 import axiosInstance from '@/api/axiosInstance';
-
+queryClient.setQueryData('user', response.user.username);
+localStorage.setItem('user', response.user.username);
+queryClient.setQueryData('token', {
+  token: response.accessToken,
+  exp: response.expirationTime,
+});
+localStorage.setItem(
+  'token',
+  JSON.stringify({
+    token: response.accessToken,
+    exp: response.expirationTime,
+  }),
+);
+queryClient.invalidateQueries('token');
 const API_URL: string = 'http://localhost:3000';
 interface LoginData {
   username: string;
   password: string;
 }
-
 interface AuthResponse {
   accessToken: string;
   expirationTime: number;
@@ -36,20 +48,7 @@ const useRefreshTokenMutation = (): UseMutationResult<
     {
       onSuccess: (response) => {
         console.log(response.accessToken);
-        queryClient.setQueryData('user', response.user.username);
-        localStorage.setItem('user', response.user.username);
-        queryClient.setQueryData('token', {
-          token: response.accessToken,
-          exp: response.expirationTime,
-        });
-        localStorage.setItem(
-          'token',
-          JSON.stringify({
-            token: response.accessToken,
-            exp: response.expirationTime,
-          }),
-        );
-        queryClient.invalidateQueries('token');
+
         console.log(queryClient.getQueryData('token'));
       },
     },
