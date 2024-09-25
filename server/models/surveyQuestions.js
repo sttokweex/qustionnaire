@@ -4,6 +4,12 @@ import Survey from './survey.js';
 const SurveyQuestions = sequelize.define(
   'surveyQuestions',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
     surveyId: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../db-connector.js';
-import Survey from './survey.js';
 import User from './user.js';
 import SurveyQuestions from './surveyQuestions.js';
 const UserAnswers = sequelize.define(
@@ -14,14 +13,7 @@ const UserAnswers = sequelize.define(
         key: 'id',
       },
     },
-    surveyId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Survey,
-        key: 'id',
-      },
-    },
+
     questionId: {
       type: DataTypes.INTEGER,
       allowNull: false,

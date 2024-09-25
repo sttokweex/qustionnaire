@@ -4,10 +4,11 @@ import SurveyQuestions from './surveyQuestions.js';
 const AnswerOptions = sequelize.define(
   'answerOptions',
   {
-    answerId: {
+    id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
     },
     questionId: {
       type: DataTypes.INTEGER,

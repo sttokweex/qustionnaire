@@ -1,10 +1,15 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../router/db-connector.js';
-import User from './user.js';
 
 const Survey = sequelize.define(
   'survey',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
     themeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -12,14 +17,6 @@ const Survey = sequelize.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    adminId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
     },
     hidden: {
       type: DataTypes.BOOLEAN,

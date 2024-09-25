@@ -10,7 +10,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 const app = fastify();
 (async () => {
-  await sequelize.sync({});
+  await sequelize.sync({ force: true });
 
   app.register(fastifyCors, {
     origin: 'http://localhost',
