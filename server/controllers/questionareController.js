@@ -1,6 +1,8 @@
 import ApiError from '../exceptions/api-error.js';
 import SurveyThemes from '../models/surveyThemes.js';
 import Survey from '../models/survey.js';
+import SurveyQuestions from '../models/surveyQuestions.js';
+import AnswerOptions from '../models/answerOptions.js';
 
 class questionareController {
   async getThemes() {
@@ -47,7 +49,6 @@ class questionareController {
       throw ApiError.InternalServerError('Error fetching surveys');
     }
   }
-
   async addTheme(request) {
     const { title } = request.body;
 
@@ -71,6 +72,56 @@ class questionareController {
       }
       throw ApiError.InternalServerError('Error creating theme');
     }
+  }
+  async addSurvey(request) {
+    const { title, themeTitle, flag } = request.body;
+    console.log(title, themeTitle, flag);
+    if (!title || typeof title !== 'string') {
+      throw ApiError.BadRequest('Invalid title provided');
+    }
+    try {
+      const theme = await SurveyThemes.findOne({
+        where: { title: themeTitle },
+      });
+      console.log(theme);
+      const candidate = await Survey.findOne({
+        where: { title: title },
+      });
+      if (candidate) {
+        throw ApiError.BadRequest('survey already exists');
+      }
+
+      await Survey.create({ themeId: theme.id, title: title, hidden: flag });
+      return { title };
+    } catch (e) {
+      if (e.name === 'SequelizeValidationError') {
+        throw ApiError.BadRequest(
+          'Validation error: ' + e.errors.map((err) => err.message).join(', '),
+        );
+      }
+      throw ApiError.InternalServerError('Error creating survey');
+    }
+  }
+  async getQuestions(request) {
+    const { title } = request.body;
+    const survey = await Survey.findOne({ where: { title } });
+
+    if (!survey) {
+      throw ApiError.NotFound('Survey not found');
+    }
+
+    const surveyId = survey.id;
+    const questions = await SurveyQuestions.findAll({
+      where: { surveyId: Number(surveyId) },
+    });
+
+    const questionIds = questions.map((question) => question.id);
+
+    const answers = await AnswerOptions.findAll({
+      where: { questionId: questionIds },
+    });
+
+    return { survey, questions, answers };
   }
 }
 

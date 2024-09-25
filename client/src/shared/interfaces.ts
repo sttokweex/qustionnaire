@@ -18,7 +18,7 @@ export interface SurveyTheme {
 export interface Survey {
   themeId: number;
   title: string;
-  adminId: number;
+
   hidden: boolean;
 }
 export interface TokenData {

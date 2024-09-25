@@ -153,8 +153,68 @@ const useSurveysByTheme = (title: string) => {
     return response.data;
   });
 };
+const useAddSurveyThemeMutation = (): UseMutationResult<
+  SurveyTheme,
+  unknown,
+  { title: string },
+  unknown
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (data: { title: string }): Promise<SurveyTheme> => {
+      const res = await axiosInstance.post<SurveyTheme>(
+        `/addSurveyTheme`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        },
+      );
+      return res.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('surveyThemes');
+      },
+    },
+  );
+};
+const useAddSurveyMutation = (): UseMutationResult<
+  Survey,
+  unknown,
+  { title: string; themeTitle: string; flag: boolean },
+  unknown
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (data: {
+      title: string;
+      themeTitle: string;
+      flag: boolean;
+    }): Promise<Survey> => {
+      const res = await axiosInstance.post<Survey>(`/addSurvey`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      return res.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('survey');
+      },
+    },
+  );
+};
 
 export {
+  useAddSurveyMutation,
+  useAddSurveyThemeMutation,
   useSurveyThemes,
   useLoginMutation,
   useRegistrationMutation,

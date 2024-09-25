@@ -12,6 +12,7 @@ const SurveyThemes = sequelize.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
   },
   {

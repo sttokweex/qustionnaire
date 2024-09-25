@@ -9,7 +9,7 @@ import {
 import AuthPage from '@/pages/authPage';
 import MainPage from '@/pages/mainPage';
 import { UserData } from '@/pages/mainPage/interfaces';
-import QuestionarePage from '@/pages/questionatePage';
+import SurveyThemePage from '@/pages/surveyThemePage';
 import { refreshToken, useLogoutMutation } from '@/shared/http';
 
 const App: FC = () => {
@@ -69,7 +69,13 @@ const App: FC = () => {
         />
         <Route
           path="/theme/:title"
-          element={userData ? <QuestionarePage /> : <Navigate to="/auth" />}
+          element={
+            userData ? (
+              <SurveyThemePage userData={userData} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
         />
         <Route
           path="/auth"
