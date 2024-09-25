@@ -3,6 +3,7 @@ import User from '../models/user.js';
 import authController from '../controllers/authController.js';
 import authMiddlewaree from '../middlewaree/auth-middlewaree.js';
 import ApiError from '../exceptions/api-error.js';
+import questionareController from '../controllers/questionareController.js';
 
 const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
@@ -27,7 +28,9 @@ const routes = async (fastify) => {
     }
     return user;
   });
-
+  fastify.get('/surveyThemes', questionareController.getThemes);
+  fastify.post('/surveys', questionareController.getSurveys);
+  fastify.post('/addSurveyTheme', questionareController.addTheme);
   fastify.get('/', async function handler() {
     return { hello: 'world' };
   });

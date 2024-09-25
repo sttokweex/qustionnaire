@@ -1,59 +1,38 @@
 import axios from 'axios';
-import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
+import {
+  useMutation,
+  UseMutationResult,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
+import { AuthResponse, LoginData, Survey, SurveyTheme } from '../interfaces';
 import axiosInstance from '@/api/axiosInstance';
-queryClient.setQueryData('user', response.user.username);
-localStorage.setItem('user', response.user.username);
-queryClient.setQueryData('token', {
-  token: response.accessToken,
-  exp: response.expirationTime,
-});
-localStorage.setItem(
-  'token',
-  JSON.stringify({
-    token: response.accessToken,
-    exp: response.expirationTime,
-  }),
-);
-queryClient.invalidateQueries('token');
-const API_URL: string = 'http://localhost:3000';
-interface LoginData {
-  username: string;
-  password: string;
-}
-interface AuthResponse {
-  accessToken: string;
-  expirationTime: number;
-  user: {
-    id: number;
-    username: string;
-    role: string;
-  };
-}
-const useRefreshTokenMutation = (): UseMutationResult<
-  AuthResponse,
-  unknown,
-  void,
-  unknown
-> => {
-  const queryClient = useQueryClient();
 
-  return useMutation(
-    (): Promise<AuthResponse> => {
-      return axios
-        .get<AuthResponse>(`${API_URL}/refresh`, {
-          withCredentials: true,
-        })
-        .then((res) => res.data);
-    },
-    {
-      onSuccess: (response) => {
-        console.log(response.accessToken);
+const API_URL: string = import.meta.env.VITE_DEV_PORT || '';
 
-        console.log(queryClient.getQueryData('token'));
-      },
-    },
-  );
+const refreshToken = async (): Promise<AuthResponse> => {
+  try {
+    const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {
+      withCredentials: true,
+    });
+    const data = response.data;
+
+    localStorage.setItem(
+      'token',
+      JSON.stringify({
+        token: data.accessToken,
+        exp: data.expirationTime,
+      }),
+    );
+
+    return data;
+  } catch (error) {
+    localStorage.removeItem('token');
+    console.log('Error refreshing token:', error);
+    throw error;
+  }
 };
+
 const useLoginMutation = (): UseMutationResult<
   AuthResponse,
   unknown,
@@ -73,12 +52,7 @@ const useLoginMutation = (): UseMutationResult<
     },
     {
       onSuccess: (response) => {
-        queryClient.setQueryData('user', response.user.username);
-        localStorage.setItem('user', response.user.username);
-        queryClient.setQueryData('token', {
-          token: response.accessToken,
-          exp: response.expirationTime,
-        });
+        queryClient.setQueryData('user', response.user);
         localStorage.setItem(
           'token',
           JSON.stringify({
@@ -86,7 +60,7 @@ const useLoginMutation = (): UseMutationResult<
             exp: response.expirationTime,
           }),
         );
-        queryClient.invalidateQueries('user');
+
         console.log(queryClient.getQueryData('user'));
       },
     },
@@ -115,12 +89,8 @@ const useRegistrationMutation = (): UseMutationResult<
     },
     {
       onSuccess: (response) => {
-        queryClient.setQueryData('user', response.user.username);
-        localStorage.setItem('user', response.user.username);
-        queryClient.setQueryData('token', {
-          token: response.accessToken,
-          exp: response.expirationTime,
-        });
+        queryClient.setQueryData('user', response.user);
+
         localStorage.setItem(
           'token',
           JSON.stringify({
@@ -128,20 +98,18 @@ const useRegistrationMutation = (): UseMutationResult<
             exp: response.expirationTime,
           }),
         );
-        queryClient.invalidateQueries('user');
+
         console.log(queryClient.getQueryData('user'));
       },
     },
   );
 };
 
-const useLogoutMutation = (): UseMutationResult<
-  void,
-  unknown,
-  void,
-  unknown
-> => {
+const useLogoutMutation = (
+  refetchUserData: () => void,
+): UseMutationResult<void, unknown, void, unknown> => {
   const queryClient = useQueryClient();
+
   return useMutation(
     (): Promise<void> => {
       return axiosInstance.post(`/logout`, null, {
@@ -154,16 +122,43 @@ const useLogoutMutation = (): UseMutationResult<
     {
       onSuccess: () => {
         queryClient.removeQueries('user');
-        queryClient.removeQueries('token');
         localStorage.clear();
+        refetchUserData();
       },
     },
   );
 };
 
+const useSurveyThemes = () => {
+  return useQuery<SurveyTheme[], Error>('surveyThemes', async () => {
+    const response = await axios.get<SurveyTheme[]>(`${API_URL}/surveyThemes`, {
+      withCredentials: true,
+    });
+    return response.data;
+  });
+};
+
+const useSurveysByTheme = (title: string) => {
+  return useQuery<Survey[], Error>(['surveys', title], async () => {
+    const response = await axiosInstance.post<Survey[]>(
+      `/surveys`,
+      { title },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  });
+};
+
 export {
+  useSurveyThemes,
   useLoginMutation,
   useRegistrationMutation,
   useLogoutMutation,
-  useRefreshTokenMutation,
+  refreshToken,
+  useSurveysByTheme,
 };

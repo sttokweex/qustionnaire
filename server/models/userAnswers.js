@@ -6,7 +6,7 @@ import SurveyQuestions from './surveyQuestions.js';
 const UserAnswers = sequelize.define(
   'userAnswers',
   {
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -14,7 +14,7 @@ const UserAnswers = sequelize.define(
         key: 'id',
       },
     },
-    survey_id: {
+    surveyId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -22,7 +22,7 @@ const UserAnswers = sequelize.define(
         key: 'id',
       },
     },
-    question_id: {
+    questionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -30,7 +30,7 @@ const UserAnswers = sequelize.define(
         key: 'id',
       },
     },
-    answer_text: {
+    answerText: {
       type: DataTypes.STRING,
       allowNull: false,
     },

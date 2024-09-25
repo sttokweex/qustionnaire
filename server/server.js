@@ -6,12 +6,12 @@ import sequelize from './router/db-connector.js';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import * as dotenv from 'dotenv';
+
 dotenv.config();
-
 const app = fastify();
-
 (async () => {
   await sequelize.sync({});
+
   app.register(fastifyCors, {
     origin: 'http://localhost',
     credentials: true,
@@ -27,7 +27,6 @@ const app = fastify();
       fastify.log.error(err);
       process.exit(1);
     }
-
     console.log(`server listening on ${app.server.address().port}`);
   });
 })();

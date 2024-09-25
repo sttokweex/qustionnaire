@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../db-connector.js';
+import sequelize from '../router/db-connector.js';
 const SurveyThemes = sequelize.define(
   'surveytheme',
   {

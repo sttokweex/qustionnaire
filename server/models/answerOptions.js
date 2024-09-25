@@ -1,15 +1,15 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../db-connector.js';
+import sequelize from '../router/db-connector.js';
 import SurveyQuestions from './surveyQuestions.js';
 const AnswerOptions = sequelize.define(
   'answerOptions',
   {
-    answer_id: {
+    answerId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    question_id: {
+    questionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -17,7 +17,7 @@ const AnswerOptions = sequelize.define(
         key: 'id',
       },
     },
-    answer_text: {
+    answerText: {
       type: DataTypes.STRING,
       allowNull: false,
     },

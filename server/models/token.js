@@ -4,7 +4,7 @@ import User from './user.js';
 const Token = sequelize.define(
   'token',
   {
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       references: {
         model: User,

@@ -3,6 +3,7 @@ version: '3.8'
 services:
   some-postgres:
     image: postgres:latest
+  
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
@@ -23,16 +24,32 @@ services:
       - pg_network
 
   server:
-    build: ./server
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server
+    restart: always
+
     ports:
       - "3000:3000"
+    volumes:
+      - ./server:/app  
     networks:
       - pg_network  
 
   client:
-    build: ./client
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client
+    restart: always
     ports:
       - "80:80"
+    volumes:
+      - ./client:/app 
+      - /app/node_modules
+    environment:
+      - VITE_DEV_PORT=http://localhost:3000
     networks:
       - pg_network
 

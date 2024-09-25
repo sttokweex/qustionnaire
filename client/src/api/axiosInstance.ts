@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { useRefreshTokenMutation } from '@/shared/http';
+import { checkAccess } from '@/shared/checkAcces';
 
-const API_URL: string = 'http://localhost:3000';
+const API_URL: string = import.meta.env.VITE_DEV_PORT;
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -13,27 +13,10 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const tokenData = localStorage.getItem('token');
-    if (tokenData) {
-      const { token, exp } = JSON.parse(tokenData);
-      const currentTime = Date.now() / 1000;
+    const token = checkAccess();
 
-      if (exp <= currentTime) {
-        const refreshTokenMutation = useRefreshTokenMutation();
-        try {
-          refreshTokenMutation.mutateAsync();
-          const newTokenData = localStorage.getItem('token');
-          if (newTokenData) {
-            const { newToken } = JSON.parse(tokenData);
-            config.headers['Authorization'] = `Bearer ${newToken}`;
-          }
-        } catch (error) {
-          console.error('Ошибка обновления токена:', error);
-        }
-      } else {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-    }
+    config.headers['Authorization'] = `Bearer ${token}`;
+
     return config;
   },
   (error) => {

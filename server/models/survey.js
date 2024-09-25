@@ -1,15 +1,19 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../db-connector.js';
+import sequelize from '../router/db-connector.js';
 import User from './user.js';
 
 const Survey = sequelize.define(
   'survey',
   {
-    theme_id: {
+    themeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    admin_id: {
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    adminId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
