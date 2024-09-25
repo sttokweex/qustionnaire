@@ -9,20 +9,17 @@ class authController {
     try {
       const { username, password } = request.body;
 
-      // Validate password length
       if (password.length < 5 || password.length > 10) {
         throw ApiError.BadRequest(
           'Password must be more than 5 characters and less than 10',
         );
       }
 
-      // Check if user already exists
       const candidate = await User.findOne({ where: { username } });
       if (candidate) {
         throw ApiError.BadRequest('User already exists');
       }
 
-      // Hash the password
       const hashPassword = bcrypt.hashSync(password, 8);
       const user = await User.create({
         username,
@@ -30,7 +27,6 @@ class authController {
         role: 'user',
       });
 
-      // Generate tokens
       const tokens = tokenService.generateTokens({
         id: user.id,
         role: user.role,
@@ -52,7 +48,7 @@ class authController {
         },
       };
     } catch (e) {
-      console.error(e); // Log the error for debugging
+      console.error(e);
       reply.status(e.status || 500).send({
         message: e.message || 'Registration error',
       });
