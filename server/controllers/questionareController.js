@@ -74,42 +74,72 @@ class questionareController {
     }
   }
   async addSurvey(request) {
-    const { title, themeTitle, flag } = request.body;
-    console.log(title, themeTitle, flag);
-    if (!title || typeof title !== 'string') {
-      throw ApiError.BadRequest('Invalid title provided');
-    }
+    const { survey, themeTitle, flag } = request.body;
     try {
       const theme = await SurveyThemes.findOne({
         where: { title: themeTitle },
       });
-      console.log(theme);
+
+      const title = survey.title;
       const candidate = await Survey.findOne({
         where: { title: title },
       });
+
       if (candidate) {
-        throw ApiError.BadRequest('survey already exists');
+        throw ApiError.BadRequest('Survey already exists');
       }
 
-      await Survey.create({ themeId: theme.id, title: title, hidden: flag });
+      const newSurvey = await Survey.create({
+        themeId: theme.id,
+        title: title,
+        hidden: flag,
+      });
+      const newSurveyId = newSurvey.id;
+      const questions = survey.questions;
+
+      await Promise.all(
+        questions.map(async (question) => {
+          const { questionText, answerOptions, answerType } = question;
+
+          const newQuestion = await SurveyQuestions.create({
+            surveyId: newSurveyId,
+            questionText: questionText,
+            answerType: answerType,
+          });
+
+          if (answerOptions.length > 0) {
+            await Promise.all(
+              answerOptions.map(async (option) => {
+                await AnswerOptions.create({
+                  questionId: newQuestion.id,
+                  answerText: option,
+                });
+              }),
+            );
+          }
+        }),
+      );
+
       return { title };
     } catch (e) {
+      console.error(e);
+
       if (e.name === 'SequelizeValidationError') {
         throw ApiError.BadRequest(
           'Validation error: ' + e.errors.map((err) => err.message).join(', '),
         );
       }
+
       throw ApiError.InternalServerError('Error creating survey');
     }
   }
+
   async getQuestions(request) {
     const { title } = request.body;
     const survey = await Survey.findOne({ where: { title } });
-
     if (!survey) {
       throw ApiError.NotFound('Survey not found');
     }
-
     const surveyId = survey.id;
     const questions = await SurveyQuestions.findAll({
       where: { surveyId: Number(surveyId) },
@@ -120,7 +150,6 @@ class questionareController {
     const answers = await AnswerOptions.findAll({
       where: { questionId: questionIds },
     });
-
     return { survey, questions, answers };
   }
 }

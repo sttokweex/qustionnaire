@@ -5,7 +5,13 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { AuthResponse, LoginData, Survey, SurveyTheme } from '../interfaces';
+import {
+  AuthResponse,
+  LoginData,
+  Question,
+  Survey,
+  SurveyTheme,
+} from '../interfaces';
 import axiosInstance from '@/api/axiosInstance';
 
 const API_URL: string = import.meta.env.VITE_DEV_PORT || '';
@@ -185,14 +191,18 @@ const useAddSurveyThemeMutation = (): UseMutationResult<
 const useAddSurveyMutation = (): UseMutationResult<
   Survey,
   unknown,
-  { title: string; themeTitle: string; flag: boolean },
+  {
+    survey: { title: string; questions: Question[] };
+    themeTitle: string;
+    flag: boolean;
+  },
   unknown
 > => {
   const queryClient = useQueryClient();
 
   return useMutation(
     async (data: {
-      title: string;
+      survey: { title: string; questions: Question[] };
       themeTitle: string;
       flag: boolean;
     }): Promise<Survey> => {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { useAddSurveyMutation, useSurveysByTheme } from '@/shared/http';
 import { Survey, SurveyThemePageProps } from './interfaces';
@@ -18,14 +18,32 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
     refetch: refetchThemes,
   } = useSurveysByTheme(title);
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'questions',
+  });
+
   useEffect(() => {
     refetchThemes();
   }, []);
+
   const onSubmit = async (data: any) => {
     const isPrivate = data.flag === 'private';
-    const flag = isPrivate;
-    const formData = { title: data.title, themeTitle: title, flag: flag };
+    const formData = {
+      survey: {
+        title: data.title,
+        questions: data.questions.map((question: any) => ({
+          questionText: question.questionText,
+          answerOptions: question.answerOptions
+            ? question.answerOptions.split(',').map((option) => option.trim())
+            : [],
+          answerType: question.answerType,
+        })),
+      },
+      themeTitle: title,
+      flag: isPrivate,
+    };
     await addSurveyMutation.mutateAsync(formData);
     refetchThemes();
   };
@@ -39,24 +57,66 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
         <div>
           <h2>Add New Survey</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <input {...register('title')} placeholder="survey Title" required />
+            <input {...register('title')} placeholder="Survey Title" required />
 
             <label>
               <input
                 type="radio"
                 {...register('flag')}
-                value="option1"
+                value="private"
                 required
               />
-              приватный
+              Приватный
             </label>
 
             <label>
-              <input type="radio" {...register('flag')} value="option2" />
-              публичный
+              <input type="radio" {...register('flag')} value="public" />
+              Публичный
             </label>
 
-            <button type="submit">Add survey</button>
+            <h3>Вопросы</h3>
+            {fields.map((item, index) => (
+              <div key={item.id}>
+                <input
+                  {...register(`questions.${index}.questionText`)}
+                  placeholder="Текст вопроса"
+                  required
+                />
+
+                <select {...register(`questions.${index}.answerType`)}>
+                  <option value="single">Один выбор</option>
+                  <option value="multiple">Несколько выборов</option>
+                  <option value="open">Открытый вопрос</option>
+                </select>
+
+                {/** Поле для ввода вариантов ответов */}
+                {['single', 'multiple'].includes(item.answerType) && (
+                  <input
+                    {...register(`questions.${index}.answerOptions`)}
+                    placeholder="Варианты ответов (через запятую)"
+                    required
+                  />
+                )}
+
+                <button type="button" onClick={() => remove(index)}>
+                  Удалить вопрос
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                append({
+                  questionText: '',
+                  answerOptions: '',
+                  answerType: 'single',
+                })
+              }
+            >
+              Добавить вопрос
+            </button>
+
+            <button type="submit">Добавить опрос</button>
           </form>
         </div>
       )}
@@ -67,7 +127,7 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
           ))}
         </ul>
       ) : (
-        error && <div>No surveys found for this theme.</div>
+        error && <div>Нет опросов для этой темы.</div>
       )}
     </div>
   );

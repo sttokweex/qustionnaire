@@ -2,6 +2,11 @@ export interface LoginData {
   username: string;
   password: string;
 }
+export interface Question {
+  title: string;
+  answerOptions: string[];
+  answerType: string;
+}
 export interface AuthResponse {
   accessToken: string;
   expirationTime: number;
