@@ -3,7 +3,8 @@ import SurveyThemes from '../models/surveyThemes.js';
 import Survey from '../models/survey.js';
 import SurveyQuestions from '../models/surveyQuestions.js';
 import AnswerOptions from '../models/answerOptions.js';
-
+import EndedSurveys from '../models/endedSurveys.js';
+import tokenService from '../service/token-service.js';
 class questionareController {
   async getThemes() {
     try {
@@ -27,6 +28,10 @@ class questionareController {
         throw ApiError.BadRequest('Invalid title provided');
       }
 
+      const authHeader = request.headers.authorization;
+      const token = authHeader.split(' ')[1];
+      const userData = tokenService.validateAccessToken(token);
+
       const theme = await SurveyThemes.findOne({ where: { title } });
       if (!theme) {
         throw ApiError.NotFound('Theme not found');
@@ -41,7 +46,22 @@ class questionareController {
         throw ApiError.NotFound('No surveys found for this theme');
       }
 
-      return surveys;
+      const endedSurveys = await EndedSurveys.findAll({
+        where: { userId: userData.id },
+      });
+      const endedSurveyIds = endedSurveys.map((survey) => survey.surveyId);
+
+      const markedSurveys = surveys.map((survey) => {
+        const surveyData = survey.get({ plain: true });
+        return {
+          ...surveyData,
+          isCompleted: endedSurveyIds.includes(survey.id),
+        };
+      });
+
+      return markedSurveys.length > 0
+        ? markedSurveys
+        : 'No available surveys for this user';
     } catch (e) {
       if (e instanceof ApiError) {
         throw e;
@@ -49,6 +69,7 @@ class questionareController {
       throw ApiError.InternalServerError('Error fetching surveys');
     }
   }
+
   async addTheme(request) {
     const { title } = request.body;
 

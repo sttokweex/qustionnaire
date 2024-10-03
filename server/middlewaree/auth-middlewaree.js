@@ -5,6 +5,7 @@ export default async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader.split(' ')[1];
     const userData = tokenService.validateAccessToken(token);
+
     if (!authHeader || !token || !userData) {
       throw ApiError.UnauthorizedError();
     }

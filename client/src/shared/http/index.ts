@@ -10,6 +10,7 @@ import {
   LoginData,
   Question,
   Survey,
+  SurveyResponse,
   SurveyTheme,
 } from '../interfaces';
 import axiosInstance from '@/api/axiosInstance';
@@ -221,8 +222,24 @@ const useAddSurveyMutation = (): UseMutationResult<
     },
   );
 };
+const useGetQuestions = (title: string) => {
+  return useQuery<SurveyResponse, Error>(['surveys', title], async () => {
+    const response = await axiosInstance.post<SurveyResponse>(
+      `/survey`,
+      { title },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  });
+};
 
 export {
+  useGetQuestions,
   useAddSurveyMutation,
   useAddSurveyThemeMutation,
   useSurveyThemes,

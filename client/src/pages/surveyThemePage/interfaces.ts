@@ -5,6 +5,7 @@ interface UserData {
 }
 export interface Survey {
   title: string;
+  isCompleted: boolean;
 }
 export interface SurveyThemePageProps {
   userData: UserData;

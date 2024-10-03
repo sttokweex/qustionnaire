@@ -30,7 +30,13 @@ const routes = async (fastify) => {
   });
   fastify.post('/survey', questionareController.getQuestions);
   fastify.get('/surveyThemes', questionareController.getThemes);
-  fastify.post('/surveys', questionareController.getSurveys);
+  fastify.post(
+    '/surveys',
+    {
+      preHandler: authMiddlewaree,
+    },
+    questionareController.getSurveys,
+  );
   fastify.post('/addSurveyTheme', questionareController.addTheme);
   fastify.post('/addSurvey', questionareController.addSurvey);
   fastify.get('/', async function handler() {

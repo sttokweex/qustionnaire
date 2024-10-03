@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAddSurveyMutation, useSurveysByTheme } from '@/shared/http';
 import { Survey, SurveyThemePageProps } from './interfaces';
 
@@ -17,8 +17,8 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
     isLoading,
     refetch: refetchThemes,
   } = useSurveysByTheme(title);
-
-  const { register, handleSubmit, control } = useForm();
+  console.log(surveys);
+  const { register, handleSubmit, control, watch } = useForm();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'questions',
@@ -27,7 +27,7 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
   useEffect(() => {
     refetchThemes();
   }, []);
-
+  const answerTypes = watch('questions');
   const onSubmit = async (data: any) => {
     const isPrivate = data.flag === 'private';
     const formData = {
@@ -36,7 +36,9 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
         questions: data.questions.map((question: any) => ({
           questionText: question.questionText,
           answerOptions: question.answerOptions
-            ? question.answerOptions.split(',').map((option) => option.trim())
+            ? question.answerOptions
+                .split(',')
+                .map((option: string) => option.trim())
             : [],
           answerType: question.answerType,
         })),
@@ -89,8 +91,9 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
                   <option value="open">Открытый вопрос</option>
                 </select>
 
-                {/** Поле для ввода вариантов ответов */}
-                {['single', 'multiple'].includes(item.answerType) && (
+                {['single', 'multiple'].includes(
+                  answerTypes[index]?.answerType,
+                ) && (
                   <input
                     {...register(`questions.${index}.answerOptions`)}
                     placeholder="Варианты ответов (через запятую)"
@@ -123,7 +126,15 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
       {surveys && surveys.length > 0 ? (
         <ul>
           {surveys.map((survey: Survey, index: number) => (
-            <li key={index}>{survey.title}</li>
+            <li key={index}>
+              {survey.isCompleted ? (
+                <span>{survey.title} (Завершен)</span>
+              ) : (
+                <Link to={`/theme/${title}/${survey.title}`}>
+                  {survey.title}
+                </Link>
+              )}
+            </li>
           ))}
         </ul>
       ) : (
