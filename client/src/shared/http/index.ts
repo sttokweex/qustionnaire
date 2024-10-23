@@ -234,6 +234,7 @@ const useGetQuestions = (title: string) => {
         withCredentials: true,
       },
     );
+
     return response.data;
   });
 };

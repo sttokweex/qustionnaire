@@ -77,13 +77,17 @@ const App: FC = () => {
               <Navigate to="/auth" />
             )
           }
-        />{' '}
+        />
         <Route
           path="/theme/:title/:surveyTitle"
           element={userData ? <QuestionPage /> : <Navigate to="/auth" />}
         />
         <Route
           path="/auth"
+          element={userData ? <Navigate to="/home" /> : <AuthPage />}
+        />
+        <Route
+          path="*"
           element={userData ? <Navigate to="/home" /> : <AuthPage />}
         />
       </Routes>
