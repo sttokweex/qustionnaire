@@ -3,11 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useLoginMutation, useRegistrationMutation } from '@/shared/http';
 import InputField from './components/inputField/inputField';
 import ToggleFormButton from './components/toggleFormButton/toggleFormButton';
-
-type FormData = {
-  username: string;
-  password: string;
-};
+import { FormData } from './interfaces';
 
 const AuthPage: FC = () => {
   const [isLogin, setIsLogin] = useState(true);

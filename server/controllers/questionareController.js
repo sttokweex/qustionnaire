@@ -63,9 +63,8 @@ class questionareController {
           const surveyData = survey.get({ plain: true });
           const isUser = userData.role !== 'admin';
 
-          // Проверка, если опрос скрыт и у пользователя роль user
           if (surveyData.hidden && isUser) {
-            return null; // Если опрос скрыт, возвращаем null
+            return null;
           }
 
           return {

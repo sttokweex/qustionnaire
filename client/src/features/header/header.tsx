@@ -1,16 +1,12 @@
 import React from 'react';
-import { useLogoutMutation } from '@/shared/http'; // Импортируем useLogoutMutation
-
-interface HeaderProps {
-  username: string;
-  onRefetch: () => void; // Пропс для refetch
-}
+import { useLogoutMutation } from '@/shared/http';
+import { HeaderProps } from './interfaces';
 
 const Header: React.FC<HeaderProps> = ({ username, onRefetch }) => {
-  const mutationLogout = useLogoutMutation(onRefetch); // Используем мутацию логаута
+  const mutationLogout = useLogoutMutation(onRefetch);
 
   const handleLogout = () => {
-    mutationLogout.mutate(); // Вызываем мутацию логаута
+    mutationLogout.mutate();
   };
 
   return (
