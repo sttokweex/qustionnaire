@@ -52,7 +52,6 @@ export const useSurvey = (surveyTitle: string) => {
     );
   }, [userAnswers, currentQuestionIndex, surveyTitle]);
 
-  // Для реагирования на изменения в вопросах
   useEffect(() => {
     if (data?.questions && currentQuestionIndex < data.questions.length) {
       const currentQuestion = data.questions[currentQuestionIndex];
@@ -66,7 +65,6 @@ export const useSurvey = (surveyTitle: string) => {
     }
   }, [openAnswer, selectedOptions, currentQuestionIndex, data]);
 
-  // Получаем список вопросов и ответов, только если `data` не undefined
   const questions: Question[] = data?.questions || [];
   const answers: Answer[] = data?.answers || [];
 

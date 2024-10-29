@@ -33,9 +33,7 @@ class questionareController {
       }
 
       const authHeader = request.headers.authorization;
-
       const token = authHeader.split(' ')[1];
-
       const userData = tokenService.validateAccessToken(token);
 
       const theme = await SurveyThemes.findOne({ where: { title } });
@@ -60,14 +58,22 @@ class questionareController {
 
       const endedSurveyIds = endedSurveys.map((survey) => survey.surveyId);
 
-      const markedSurveys = surveys.map((survey) => {
-        const surveyData = survey.get({ plain: true });
+      const markedSurveys = surveys
+        .map((survey) => {
+          const surveyData = survey.get({ plain: true });
+          const isUser = userData.role !== 'admin';
 
-        return {
-          ...surveyData,
-          isCompleted: endedSurveyIds.includes(survey.id),
-        };
-      });
+          // Проверка, если опрос скрыт и у пользователя роль user
+          if (surveyData.hidden && isUser) {
+            return null; // Если опрос скрыт, возвращаем null
+          }
+
+          return {
+            ...surveyData,
+            isCompleted: endedSurveyIds.includes(survey.id),
+          };
+        })
+        .filter((survey) => survey !== null);
 
       return markedSurveys.length > 0
         ? markedSurveys

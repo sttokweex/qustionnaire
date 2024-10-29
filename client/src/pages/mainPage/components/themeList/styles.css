@@ -1,0 +1,11 @@
+.list {
+  @apply list-none p-0;
+}
+
+.list-item {
+  @apply mb-2;
+}
+
+.link {
+  @apply text-blue-500 hover:text-blue-700 transition-colors;
+}

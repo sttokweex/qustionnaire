@@ -1,15 +1,7 @@
-// Question.tsx
+// components/QuestionComponent.tsx
 import React from 'react';
-import { Answer, Question } from '../interfaces';
-
-interface QuestionProps {
-  question: Question;
-  answers: Answer[];
-  selectedOptions: string[];
-  openAnswer: string;
-  setOpenAnswer: (value: string) => void;
-  onOptionChange: (option: string) => void;
-}
+import { QuestionProps } from './interfaces';
+import './styles.css';
 
 const QuestionComponent: React.FC<QuestionProps> = ({
   question,
@@ -20,11 +12,12 @@ const QuestionComponent: React.FC<QuestionProps> = ({
   onOptionChange,
 }) => {
   return (
-    <div>
-      <h2>{question.questionText}</h2>
+    <div className="question-container">
+      <h2 className="question-title">{question.questionText}</h2>
       {question.answerType === 'open' ? (
         <input
           type="text"
+          className="input-text"
           value={openAnswer}
           onChange={(e) => setOpenAnswer(e.target.value)}
           placeholder="Введите ваш ответ"
@@ -33,7 +26,7 @@ const QuestionComponent: React.FC<QuestionProps> = ({
         answers
           .filter((answer) => answer.questionId === question.id)
           .map((answer) => (
-            <div key={answer.id}>
+            <div key={answer.id} className="answer-option">
               <label>
                 {question.answerType === 'multiple' ? (
                   <input

@@ -1,0 +1,11 @@
+.navigation {
+  @apply mt-4;
+}
+
+.navigation button {
+  @apply bg-blue-500 text-white py-2 px-4 rounded-md mr-2 hover:bg-blue-600 transition;
+}
+
+.navigation button[disabled] {
+  @apply bg-gray-400 cursor-not-allowed;
+}

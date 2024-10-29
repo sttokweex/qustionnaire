@@ -1,0 +1,15 @@
+.container {
+  @apply max-w-md mx-auto bg-white shadow-md rounded-lg p-6 mt-10;
+}
+
+.title {
+  @apply text-2xl font-bold mb-4;
+}
+
+.input {
+  @apply w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200;
+}
+
+.button {
+  @apply w-full bg-blue-500 text-white font-bold py-2 rounded-md hover:bg-blue-600 transition;
+}

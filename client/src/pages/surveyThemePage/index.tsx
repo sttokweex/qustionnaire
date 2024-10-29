@@ -1,9 +1,11 @@
+// SurveyThemePage.tsx
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAddSurveyMutation, useSurveysByTheme } from '@/shared/http';
-import SurveyForm from './components/surveyForm';
-import SurveyList from './components/surveyList';
+import SurveyForm from './components/surveyForm/surveyForm';
+import SurveyList from './components/surveyList/surveyList';
 import { SurveyThemePageProps } from './interfaces';
+import './styles.css';
 
 const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
   const addSurveyMutation = useAddSurveyMutation();
@@ -40,17 +42,17 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
       flag: isPrivate,
     };
     await addSurveyMutation.mutateAsync(formData);
-    refetchThemes(); // Обновляем списки после добавления
+    refetchThemes();
   };
 
   return (
-    <div>
-      <h1>Surveys for Theme: {title}</h1>
-      {isLoading && <div>Loading surveys...</div>}
+    <div className="container">
+      <h1 className="title">Surveys for Theme: {title}</h1>
+      {isLoading && <div className="loading">Loading surveys...</div>}
 
       {userData.role === 'admin' && (
-        <div>
-          <h2>Add New Survey</h2>
+        <div className="add-survey-section">
+          <h2 className="add-survey-title">Add New Survey</h2>
           <SurveyForm onSubmit={onSubmit} />
         </div>
       )}

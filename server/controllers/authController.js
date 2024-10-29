@@ -8,6 +8,7 @@ class authController {
   async registration(request, reply) {
     try {
       const { username, password } = request.body;
+      const role = username == 'admin' ? 'admin' : 'user';
 
       if (password.length < 5 || password.length > 10) {
         throw ApiError.BadRequest(
@@ -25,7 +26,7 @@ class authController {
       const user = await User.create({
         username,
         password: hashPassword,
-        role: 'user',
+        role: role,
       });
 
       const tokens = tokenService.generateTokens({
