@@ -73,7 +73,7 @@ const App: FC = () => {
           path="/theme/:title"
           element={
             userData ? (
-              <SurveyThemePage userData={userData} />
+              <SurveyThemePage userData={userData} refetch={refetch} />
             ) : (
               <Navigate to="/auth" />
             )
@@ -83,7 +83,7 @@ const App: FC = () => {
           path="/theme/:title/:surveyTitle"
           element={
             userData ? (
-              <QuestionPage userData={userData} />
+              <QuestionPage userData={userData} refetch={refetch} />
             ) : (
               <Navigate to="/auth" />
             )

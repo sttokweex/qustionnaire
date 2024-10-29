@@ -1,3 +1,5 @@
+import { QueryObserverResult } from 'react-query';
+
 export interface Question {
   id: number;
   questionText: string;
@@ -17,4 +19,8 @@ export interface UserData {
 }
 export interface QuestionPageProps {
   userData: UserData;
+  refetch: (options?: {
+    throwOnError?: boolean;
+    cancelRefetch?: boolean;
+  }) => Promise<QueryObserverResult<UserData | undefined, unknown>>;
 }

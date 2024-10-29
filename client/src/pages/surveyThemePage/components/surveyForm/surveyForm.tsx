@@ -1,7 +1,6 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { SurveyFormData } from './interfaces';
-import './styles.css';
 
 const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
   onSubmit,
@@ -43,35 +42,42 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
     onSubmit(data);
     reset({
       questions: [],
-      title: '', // Теперь добавляем очистку названия.
-      flag: 'private', // Чтобы сбросился флаг в первоначальное состояние.
+      title: '',
+      flag: 'private',
     });
   };
 
   return (
-    <form className="form-container" onSubmit={handleSubmit(handleFormSubmit)}>
+    <form
+      className="bg-white shadow-lg rounded-lg p-6"
+      onSubmit={handleSubmit(handleFormSubmit)}
+    >
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        Создать новый опрос
+      </h2>
       <input
-        className="input"
+        className="input mb-4 p-2 border border-gray-300 rounded w-full"
         {...register('title')}
-        placeholder="Survey Title"
+        placeholder="Название опроса"
         required
       />
 
-      <label className="radio-label">
-        <input type="radio" {...register('flag')} value="private" required />
-        Приватный
-      </label>
+      <div className="flex justify-center mb-4 space-x-6">
+        <label className="flex items-center">
+          <input type="radio" {...register('flag')} value="private" required />
+          <span className="ml-2">Приватный</span>
+        </label>
+        <label className="flex items-center">
+          <input type="radio" {...register('flag')} value="public" />
+          <span className="ml-2">Публичный</span>
+        </label>
+      </div>
 
-      <label className="radio-label">
-        <input type="radio" {...register('flag')} value="public" />
-        Публичный
-      </label>
-
-      <h3>Вопросы</h3>
+      <h3 className="text-lg font-semibold mb-2">Вопросы</h3>
       {fields.map((item, index) => (
-        <div key={item.id}>
+        <div key={item.id} className="mb-4">
           <input
-            className="input"
+            className="input mb-2 p-2 border border-gray-300 rounded w-full"
             {...register(`questions.${index}.questionText`)}
             placeholder="Текст вопроса"
             required
@@ -79,7 +85,7 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
 
           <select
             {...register(`questions.${index}.answerType`)}
-            className="input mb-4"
+            className="input mb-2 p-2 border border-gray-300 rounded w-full"
           >
             <option value="single">Один выбор</option>
             <option value="multiple">Несколько выборов</option>
@@ -88,7 +94,7 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
 
           {['single', 'multiple'].includes(answerTypes[index]?.answerType) && (
             <input
-              className="input"
+              className="input mb-2 p-2 border border-gray-300 rounded w-full"
               {...register(`questions.${index}.answerOptions`)}
               placeholder="Варианты ответов (через запятую)"
               required
@@ -97,7 +103,7 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
 
           <button
             type="button"
-            className="remove-question-button"
+            className="remove-question-button text-red-600 hover:text-red-500"
             onClick={() => remove(index)}
           >
             Удалить вопрос
@@ -107,7 +113,7 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
 
       <button
         type="button"
-        className="add-question-button"
+        className="add-question-button bg-indigo-600 text-white rounded py-2 px-4 mb-4 hover:bg-indigo-500 transition duration-300" // Новые цвета для кнопки "Добавить вопрос"
         onClick={() =>
           append({
             questionText: '',
@@ -119,8 +125,11 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
         Добавить вопрос
       </button>
 
-      <button type="submit" className="submit-button">
-        Добавить опрос
+      <button
+        type="submit"
+        className="submit-button bg-teal-600 text-white rounded py-2 mb-4 w-full hover:bg-teal-500 transition duration-300" // Новые цвета для кнопки "Создать опрос"
+      >
+        Создать опрос
       </button>
     </form>
   );

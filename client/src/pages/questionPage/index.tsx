@@ -1,20 +1,21 @@
-// QuestionPage.tsx
+// components/QuestionPage.tsx
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Header from '@/features/header/header'; // Импортируем Header
 import { useSubmitSurveyMutation } from '@/shared/http';
-import Question from './components/question/question';
+import Question from './components/question/Question';
 import QuestionNavigation from './components/questionNavigate/QuestionNavigation';
 import QuestionNumbers from './components/questionNumbers/QuestionNumbers';
 import SurveyResults from './components/surveyResult/SurveyResults';
 import { useSurvey } from './hooks/useSurvey';
 import { QuestionPageProps } from './interfaces';
 
-const QuestionPage: React.FC<QuestionPageProps> = ({ userData }) => {
+const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
   const { surveyTitle } = useParams<{ surveyTitle: string }>();
   const navigate = useNavigate();
 
   if (!surveyTitle) {
-    return <div>No title</div>;
+    return <div>Ошибка: заголовок отсутствует.</div>;
   }
 
   const {
@@ -35,11 +36,11 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData }) => {
 
   const submitSurveyMutation = useSubmitSurveyMutation();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Загрузка...</div>;
 
-  if (error) return <div>Error loading questions: {error.message}</div>;
+  if (error) return <div>Ошибка при загрузке вопросов: {error.message}</div>;
 
-  if (!questions.length) return <div>No questions available.</div>;
+  if (!questions.length) return <div>Нет доступных вопросов.</div>;
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -107,9 +108,9 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData }) => {
               : result.userAnswer || '',
           })),
         });
-        console.log('Response from server:', submitSurveyMutation.data);
+        console.log('Ответ от сервера:', submitSurveyMutation.data);
       } catch (error) {
-        console.error('Error sending survey results:', error);
+        console.error('Ошибка при отправке результатов опроса:', error);
       } finally {
         navigate(-1);
       }
@@ -124,35 +125,53 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData }) => {
   );
 
   return (
-    <div>
-      {!surveyCompleted ? (
-        <>
-          <Question
-            question={currentQuestion}
-            answers={answers}
-            selectedOptions={selectedOptions}
-            onOptionChange={handleOptionChange}
-            openAnswer={openAnswer}
-            setOpenAnswer={setOpenAnswer}
+    <>
+      <Header username={userData.username} onRefetch={refetch} />
+      {/* Добавлена шапка */}
+      <div className="max-w-xl mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-center mb-2 text-purple-800">
+          Опрос: {surveyTitle}
+        </h1>
+        {!surveyCompleted ? (
+          <>
+            <Question
+              question={currentQuestion}
+              answers={answers}
+              selectedOptions={selectedOptions}
+              onOptionChange={handleOptionChange}
+              openAnswer={openAnswer}
+              setOpenAnswer={setOpenAnswer}
+            />
+            <QuestionNavigation
+              currentQuestionIndex={currentQuestionIndex}
+              onPrev={handlePrevQuestion}
+              onNext={handleNextQuestion}
+              totalQuestions={questions.length}
+              onComplete={() => setSurveyCompleted(true)}
+              isAllAnswered={isAllAnswered}
+            />
+            <QuestionNumbers
+              questions={questions}
+              currentQuestionIndex={currentQuestionIndex}
+              onClick={setCurrentQuestionIndex}
+            />
+            {/* Кнопка перемещена вниз */}
+            <button
+              onClick={() => navigate(-1)}
+              className="mt-4 px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-300"
+            >
+              К опросам
+            </button>
+          </>
+        ) : (
+          <SurveyResults
+            results={results}
+            onSend={sendResults}
+            onBack={() => setSurveyCompleted(false)}
           />
-          <QuestionNavigation
-            currentQuestionIndex={currentQuestionIndex}
-            onPrev={handlePrevQuestion}
-            onNext={handleNextQuestion}
-            totalQuestions={questions.length}
-            onComplete={() => setSurveyCompleted(true)}
-            isAllAnswered={isAllAnswered}
-          />
-          <QuestionNumbers
-            questions={questions}
-            currentQuestionIndex={currentQuestionIndex}
-            onClick={setCurrentQuestionIndex}
-          />
-        </>
-      ) : (
-        <SurveyResults results={results} onSend={sendResults} />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

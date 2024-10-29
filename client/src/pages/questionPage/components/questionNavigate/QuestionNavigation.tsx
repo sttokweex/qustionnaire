@@ -1,6 +1,5 @@
 // components/QuestionNavigation.tsx
 import React from 'react';
-import './styles.css'; // Импорт стилей
 import { QuestionNavigationProps } from './interfaces';
 
 const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
@@ -12,12 +11,34 @@ const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   isAllAnswered,
 }) => {
   return (
-    <div className="navigation">
-      {currentQuestionIndex > 0 && <button onClick={onPrev}>Назад</button>}
-      {currentQuestionIndex < totalQuestions - 1 && (
-        <button onClick={onNext}>Далее</button>
-      )}
-      <button onClick={onComplete} disabled={!isAllAnswered}>
+    <div className="flex flex-col items-center my-4">
+      <div className="flex justify-between w-full">
+        <button
+          onClick={onPrev}
+          disabled={currentQuestionIndex === 0}
+          className={`px-4 py-2 ${currentQuestionIndex === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700'} font-semibold rounded-lg transition duration-300`}
+        >
+          Назад
+        </button>
+        <button
+          onClick={onNext}
+          disabled={currentQuestionIndex >= totalQuestions - 1}
+          className={`px-4 py-2 ${currentQuestionIndex >= totalQuestions - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700'} font-semibold rounded-lg transition duration-300`}
+        >
+          Далее
+        </button>
+      </div>
+
+      {/* Кнопка завершения опроса */}
+      <button
+        onClick={onComplete}
+        disabled={!isAllAnswered}
+        className={`mt-4 px-4 py-2 font-semibold rounded-lg transition duration-300 ${
+          isAllAnswered
+            ? 'bg-green-600 text-white hover:bg-green-700'
+            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+        }`}
+      >
         Завершить опрос
       </button>
     </div>
