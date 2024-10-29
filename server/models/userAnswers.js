@@ -3,6 +3,7 @@ import sequelize from '../db-connector.js';
 import User from './user.js';
 import SurveyQuestions from './surveyQuestions.js';
 import Survey from './survey.js';
+
 const UserAnswers = sequelize.define(
   'userAnswers',
   {

@@ -6,8 +6,7 @@ const SurveyList: React.FC<{ surveys: Survey[]; themeTitle: string }> = ({
   surveys,
   themeTitle,
 }) => {
-  // Проверяем, есть ли опросы
-  if (!surveys || surveys.length === 0) {
+  if (!Array.isArray(surveys) || surveys.length === 0) {
     return <div>Нет опросов для этой темы.</div>;
   }
 

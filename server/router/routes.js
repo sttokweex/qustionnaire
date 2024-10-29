@@ -1,5 +1,4 @@
 import User from '../models/user.js';
-
 import authController from '../controllers/authController.js';
 import authMiddlewaree from '../middlewaree/auth-middlewaree.js';
 import ApiError from '../exceptions/api-error.js';
@@ -17,15 +16,18 @@ const routes = async (fastify) => {
     },
     async () => {
       const users = await User.findAll();
+
       return users;
     },
   );
   fastify.get('/user/:id', async (request) => {
     const id = request.params.id;
     const user = await User.findOne({ where: { id: +id } });
+
     if (!user) {
       throw ApiError.BadRequest('Пользователь не найден');
     }
+
     return user;
   });
   fastify.post('/survey', questionareController.getQuestions);
@@ -39,6 +41,7 @@ const routes = async (fastify) => {
   );
   fastify.post('/addSurveyTheme', questionareController.addTheme);
   fastify.post('/addSurvey', questionareController.addSurvey);
+  fastify.post('/endSurvey', questionareController.submitSurvey);
   fastify.get('/', async function handler() {
     return { hello: 'world' };
   });

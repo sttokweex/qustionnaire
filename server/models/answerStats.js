@@ -1,7 +1,8 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../db-connector.js';
+import sequelize from '../router/db-connector.js';
 import SurveyQuestions from './surveyQuestions.js';
 import Survey from './survey.js';
+
 const AnswerStats = sequelize.define(
   'answerStats',
   {

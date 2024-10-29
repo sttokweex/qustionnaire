@@ -1,5 +1,6 @@
 import ApiError from '../exceptions/api-error.js';
 import tokenService from '../service/token-service.js';
+
 export default async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;

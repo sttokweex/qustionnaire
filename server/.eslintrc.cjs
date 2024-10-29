@@ -28,5 +28,13 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    'padding-line-between-statements': [
+      'warn',
+      { blankLine: 'always', prev: '*', next: 'return' },
+      { blankLine: 'always', prev: '*', next: 'if' },
+      { blankLine: 'always', prev: '*', next: 'for' },
+      { blankLine: 'always', prev: 'import', next: '*' },
+      { blankLine: 'never', prev: 'import', next: 'import' },
+    ],
   },
 };

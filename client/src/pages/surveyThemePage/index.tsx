@@ -9,20 +9,19 @@ const SurveyThemePage: React.FC<SurveyThemePageProps> = ({ userData }) => {
   const addSurveyMutation = useAddSurveyMutation();
   const { title } = useParams<{ title: string }>();
 
-  // Проверяем наличие заголовка
   if (!title) {
     return <div>Error: Title is missing from the URL.</div>;
   }
 
   const {
-    data: surveys = [], // Устанавливаем значение по умолчанию
+    data: surveys = [],
     isLoading,
     refetch: refetchThemes,
   } = useSurveysByTheme(title);
 
   useEffect(() => {
     refetchThemes();
-  }, [title, refetchThemes]); // Добавляем title и refetchThemes в зависимости
+  }, [title, refetchThemes]);
 
   const onSubmit = async (data: any) => {
     const isPrivate = data.flag === 'private';

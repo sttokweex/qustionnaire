@@ -10,3 +10,11 @@ export interface Answer {
   questionId: number;
   answerText: string;
 }
+export interface UserData {
+  username: string;
+  id: number;
+  role: string;
+}
+export interface QuestionPageProps {
+  userData: UserData;
+}

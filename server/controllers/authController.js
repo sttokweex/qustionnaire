@@ -16,6 +16,7 @@ class authController {
       }
 
       const candidate = await User.findOne({ where: { username } });
+
       if (candidate) {
         throw ApiError.BadRequest('User already exists');
       }
@@ -60,11 +61,13 @@ class authController {
       const { username, password } = request.body;
 
       const user = await User.findOne({ where: { username } });
+
       if (!user) {
         throw ApiError.BadRequest('User not found');
       }
 
       const validPassword = bcrypt.compareSync(password, user.password);
+
       if (!validPassword) {
         throw ApiError.BadRequest('Invalid password');
       }
@@ -100,12 +103,14 @@ class authController {
   async logout(request, reply) {
     try {
       const { refreshToken } = request.cookies;
+
       if (!refreshToken) {
         throw ApiError.BadRequest('Token not found');
       }
 
       await tokenService.removeToken(refreshToken);
       reply.clearCookie('refreshToken');
+
       return { message: 'Successfully logged out' };
     } catch (e) {
       console.error(e);
@@ -116,18 +121,21 @@ class authController {
   async refresh(request, reply) {
     try {
       const { refreshToken } = request.cookies;
+
       if (!refreshToken) {
         throw ApiError.UnauthorizedError('Unauthorized');
       }
 
       const userData = tokenService.validateRefreshToken(refreshToken);
       const tokenFromDb = await tokenService.findToken(refreshToken);
+
       if (!userData || !tokenFromDb) {
         await tokenService.removeToken(refreshToken);
         throw ApiError.UnauthorizedError('Unauthorized');
       }
 
       const user = await User.findOne({ where: { id: userData.id } });
+
       if (!user) {
         throw ApiError.UnauthorizedError('User not found');
       }

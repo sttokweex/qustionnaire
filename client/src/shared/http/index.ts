@@ -47,6 +47,7 @@ const useLoginMutation = (): UseMutationResult<
   unknown
 > => {
   const queryClient = useQueryClient();
+
   return useMutation(
     async (data: LoginData): Promise<AuthResponse> => {
       const res = await axiosInstance.post<AuthResponse>(`/login`, data, {
@@ -55,6 +56,7 @@ const useLoginMutation = (): UseMutationResult<
         },
         withCredentials: true,
       });
+
       return res.data;
     },
     {
@@ -80,6 +82,7 @@ const useRegistrationMutation = (): UseMutationResult<
   LoginData
 > => {
   const queryClient = useQueryClient();
+
   return useMutation(
     async (data: LoginData): Promise<AuthResponse> => {
       const res = await axiosInstance.post<AuthResponse>(
@@ -92,6 +95,7 @@ const useRegistrationMutation = (): UseMutationResult<
           withCredentials: true,
         },
       );
+
       return res.data;
     },
     {
@@ -141,6 +145,7 @@ const useSurveyThemes = () => {
     const response = await axios.get<SurveyTheme[]>(`${API_URL}/surveyThemes`, {
       withCredentials: true,
     });
+
     return response.data;
   });
 };
@@ -157,6 +162,7 @@ const useSurveysByTheme = (title: string) => {
         withCredentials: true,
       },
     );
+
     return response.data;
   });
 };
@@ -180,6 +186,7 @@ const useAddSurveyThemeMutation = (): UseMutationResult<
           withCredentials: true,
         },
       );
+
       return res.data;
     },
     {
@@ -213,6 +220,7 @@ const useAddSurveyMutation = (): UseMutationResult<
         },
         withCredentials: true,
       });
+
       return res.data;
     },
     {
@@ -238,8 +246,40 @@ const useGetQuestions = (title: string) => {
     return response.data;
   });
 };
+const useSubmitSurveyMutation = (): UseMutationResult<
+  SurveyResponse,
+  unknown,
+  {
+    endedSurvey: { surveyTitle: string; userId: number };
+    answerStats: {
+      questionId: number;
+      answerText: string;
+    }[];
+  },
+  unknown
+> => {
+  return useMutation(
+    async (data: {
+      endedSurvey: { surveyTitle: string; userId: number };
+      answerStats: {
+        questionId: number;
+        answerText: string;
+      }[];
+    }): Promise<SurveyResponse> => {
+      const res = await axiosInstance.post<SurveyResponse>(`/endSurvey`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+
+      return res.data;
+    },
+  );
+};
 
 export {
+  useSubmitSurveyMutation,
   useGetQuestions,
   useAddSurveyMutation,
   useAddSurveyThemeMutation,

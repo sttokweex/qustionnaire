@@ -11,12 +11,14 @@ class TokenService {
       expiresIn: '30d',
     });
     const expirationTime = Math.floor(Date.now() / 1000) + 30 * 60;
+
     return { accessToken, refreshToken, expirationTime };
   }
 
   validateAccessToken(token) {
     try {
       const userData = jwt.verify(token, secret.access_secret);
+
       return userData;
     } catch (e) {
       return null;
@@ -26,6 +28,7 @@ class TokenService {
   validateRefreshToken(token) {
     try {
       const userData = jwt.verify(token, secret.refresh_secret);
+
       return userData;
     } catch (e) {
       return null;
@@ -34,14 +37,17 @@ class TokenService {
 
   async saveToken(userId, refreshToken) {
     const tokenData = await Token.findOne({ where: { userId: userId } });
+
     if (tokenData) {
       tokenData.refresh = refreshToken;
+
       return tokenData.save();
     }
     const token = await Token.create({
       userId: userId,
       refresh: refreshToken,
     });
+
     return token;
   }
 
@@ -49,6 +55,7 @@ class TokenService {
     const tokenData = await Token.destroy({
       where: { refresh: refreshToken },
     });
+
     return tokenData;
   }
 
@@ -56,9 +63,9 @@ class TokenService {
     const tokenData = await Token.findOne({
       where: { refresh: refreshToken },
     });
+
     return tokenData;
   }
-
 }
 
 export default new TokenService();

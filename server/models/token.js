@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../router/db-connector.js';
 import User from './user.js';
+
 const Token = sequelize.define(
   'token',
   {

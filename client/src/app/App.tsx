@@ -30,6 +30,7 @@ const App: FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+
     if (token) {
       refreshToken()
         .then((response) => {
@@ -80,7 +81,13 @@ const App: FC = () => {
         />
         <Route
           path="/theme/:title/:surveyTitle"
-          element={userData ? <QuestionPage /> : <Navigate to="/auth" />}
+          element={
+            userData ? (
+              <QuestionPage userData={userData} />
+            ) : (
+              <Navigate to="/auth" />
+            )
+          }
         />
         <Route
           path="/auth"

@@ -11,6 +11,7 @@ export const checkAccess = async (): Promise<string | null> => {
     if (exp <= currentTime) {
       try {
         const newTokenData = await refreshToken();
+
         return newTokenData.accessToken;
       } catch (error) {
         console.error('Ошибка обновления токена:', error);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LoginForm from '@/features/loginForm/LoginForm';
 import RegisterForm from '@/features/registerForm/registerForm';
+
 const AuthPage: React.FC = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);

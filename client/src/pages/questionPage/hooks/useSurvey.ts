@@ -4,10 +4,12 @@ import { Answer, Question } from '../interfaces';
 
 export const useSurvey = (surveyTitle: string) => {
   const { data, isLoading, error } = useGetQuestions(surveyTitle);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
     const savedIndex = localStorage.getItem(
       `${surveyTitle}_currentQuestionIndex`,
     );
+
     return savedIndex ? Number(savedIndex) : 0;
   });
 
@@ -20,16 +22,23 @@ export const useSurvey = (surveyTitle: string) => {
 
   useEffect(() => {
     const savedAnswers = localStorage.getItem(`userAnswers`);
+
     if (savedAnswers) {
       const parsedAnswers = JSON.parse(savedAnswers);
       setUserAnswers(parsedAnswers);
-      const currentQuestionId = data?.questions[currentQuestionIndex]?.id;
-      if (currentQuestionId) {
-        const previousAnswer = parsedAnswers[currentQuestionId];
-        if (Array.isArray(previousAnswer)) {
-          setSelectedOptions(previousAnswer);
-        } else {
-          setOpenAnswer(previousAnswer || '');
+
+      // Проверка на наличие вопросов
+      if (data?.questions && currentQuestionIndex < data.questions.length) {
+        const currentQuestionId = data.questions[currentQuestionIndex]?.id;
+
+        if (currentQuestionId) {
+          const previousAnswer = parsedAnswers[currentQuestionId];
+
+          if (Array.isArray(previousAnswer)) {
+            setSelectedOptions(previousAnswer);
+          } else {
+            setOpenAnswer(previousAnswer || '');
+          }
         }
       }
     }
@@ -43,8 +52,9 @@ export const useSurvey = (surveyTitle: string) => {
     );
   }, [userAnswers, currentQuestionIndex, surveyTitle]);
 
+  // Для реагирования на изменения в вопросах
   useEffect(() => {
-    if (data && currentQuestionIndex < data?.questions.length) {
+    if (data?.questions && currentQuestionIndex < data.questions.length) {
       const currentQuestion = data.questions[currentQuestionIndex];
       const answerKey = currentQuestion.id;
 
@@ -56,6 +66,7 @@ export const useSurvey = (surveyTitle: string) => {
     }
   }, [openAnswer, selectedOptions, currentQuestionIndex, data]);
 
+  // Получаем список вопросов и ответов, только если `data` не undefined
   const questions: Question[] = data?.questions || [];
   const answers: Answer[] = data?.answers || [];
 
