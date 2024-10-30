@@ -12,13 +12,13 @@ const ToggleFormButton: React.FC<ToggleFormButtonProps> = ({
   return (
     <div className="text-center mt-4">
       <span className="text-sm">
-        {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}
+        {isLogin ? 'No account?' : 'Already have an account?'}
       </span>
       <button
         className="text-blue-400 hover:underline ml-1"
         onClick={() => setIsLogin(!isLogin)}
       >
-        {isLogin ? 'Регистрация' : 'Вход'}
+        {isLogin ? 'Register' : 'Login'}
       </button>
     </div>
   );

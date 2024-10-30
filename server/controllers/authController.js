@@ -50,7 +50,6 @@ class authController {
         },
       };
     } catch (e) {
-      console.error(e);
       reply.status(e.status || 500).send({
         message: e.message || 'Registration error',
       });
@@ -94,7 +93,6 @@ class authController {
         },
       };
     } catch (e) {
-      console.error(e);
       reply.status(e.status || 500).send({
         message: e.message || 'Login error',
       });
@@ -162,7 +160,6 @@ class authController {
         },
       };
     } catch (e) {
-      console.error(e);
       reply.status(e.status || 500).send({
         message: e.message || 'Token refresh error',
       });

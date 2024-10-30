@@ -36,8 +36,7 @@ const App: FC = () => {
         .then((response) => {
           queryClient.setQueryData('user', response.user);
         })
-        .catch((err) => {
-          console.error('Token refresh failed:', err);
+        .catch(() => {
           mutationLogout.mutate();
         })
         .finally(() => {

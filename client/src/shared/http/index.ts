@@ -35,7 +35,7 @@ const refreshToken = async (): Promise<AuthResponse> => {
     return data;
   } catch (error) {
     localStorage.removeItem('token');
-    console.log('Error refreshing token:', error);
+
     throw error;
   }
 };
@@ -69,8 +69,6 @@ const useLoginMutation = (): UseMutationResult<
             exp: response.expirationTime,
           }),
         );
-
-        console.log(queryClient.getQueryData('user'));
       },
     },
   );
@@ -109,8 +107,6 @@ const useRegistrationMutation = (): UseMutationResult<
             exp: response.expirationTime,
           }),
         );
-
-        console.log(queryClient.getQueryData('user'));
       },
     },
   );
@@ -277,8 +273,32 @@ const useSubmitSurveyMutation = (): UseMutationResult<
     },
   );
 };
+const useToggleSurveyVisibilityMutation = (): UseMutationResult<
+  { hidden: boolean },
+  unknown,
+  { surveyId: number },
+  unknown
+> => {
+  return useMutation(
+    async (data: { surveyId: number }): Promise<{ hidden: boolean }> => {
+      const res = await axiosInstance.post<{ hidden: boolean }>(
+        `/toggleVisible`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        },
+      );
+
+      return res.data;
+    },
+  );
+};
 
 export {
+  useToggleSurveyVisibilityMutation,
   useSubmitSurveyMutation,
   useGetQuestions,
   useAddSurveyMutation,

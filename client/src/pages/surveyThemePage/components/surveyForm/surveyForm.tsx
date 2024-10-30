@@ -1,10 +1,12 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { SurveyFormData } from './interfaces';
 
-const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
-  onSubmit,
-}) => {
+const SurveyForm: React.FC<{
+  onSubmit: (data: SurveyFormData) => Promise<void>;
+}> = ({ onSubmit }) => {
   const { register, handleSubmit, control, watch, reset } =
     useForm<SurveyFormData>({
       defaultValues: {
@@ -23,7 +25,7 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
 
   const answerTypes = watch('questions');
 
-  const handleFormSubmit = (data: SurveyFormData) => {
+  const handleFormSubmit = async (data: SurveyFormData) => {
     data.questions = data.questions.map((question) => {
       if (
         ['single', 'multiple'].includes(question.answerType) &&
@@ -39,99 +41,124 @@ const SurveyForm: React.FC<{ onSubmit: (data: SurveyFormData) => void }> = ({
       return question;
     });
 
-    onSubmit(data);
-    reset({
-      questions: [],
-      title: '',
-      flag: 'private',
-    });
+    try {
+      await onSubmit(data); // Wait for onSubmit to finish
+      toast.success('Survey added successfully!'); // Success notification
+      reset({
+        questions: [
+          { questionText: '', answerOptions: '', answerType: 'single' },
+        ],
+        title: '',
+        flag: 'private',
+      });
+    } catch (error: any) {
+      const errorMessage =
+        error.message || 'Error adding theme. Please try again.';
+      toast.error(errorMessage);
+    }
   };
 
   return (
-    <form
-      className="bg-white shadow-lg rounded-lg p-6"
-      onSubmit={handleSubmit(handleFormSubmit)}
-    >
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        Создать новый опрос
-      </h2>
-      <input
-        className="input mb-4 p-2 border border-gray-300 rounded w-full"
-        {...register('title')}
-        placeholder="Название опроса"
-        required
-      />
-
-      <div className="flex justify-center mb-4 space-x-6">
-        <label className="flex items-center">
-          <input type="radio" {...register('flag')} value="private" required />
-          <span className="ml-2">Приватный</span>
-        </label>
-        <label className="flex items-center">
-          <input type="radio" {...register('flag')} value="public" />
-          <span className="ml-2">Публичный</span>
-        </label>
-      </div>
-
-      <h3 className="text-lg font-semibold mb-2">Вопросы</h3>
-      {fields.map((item, index) => (
-        <div key={item.id} className="mb-4">
-          <input
-            className="input mb-2 p-2 border border-gray-300 rounded w-full"
-            {...register(`questions.${index}.questionText`)}
-            placeholder="Текст вопроса"
-            required
-          />
-
-          <select
-            {...register(`questions.${index}.answerType`)}
-            className="input mb-2 p-2 border border-gray-300 rounded w-full"
-          >
-            <option value="single">Один выбор</option>
-            <option value="multiple">Несколько выборов</option>
-            <option value="open">Открытый вопрос</option>
-          </select>
-
-          {['single', 'multiple'].includes(answerTypes[index]?.answerType) && (
+    <div>
+      <form
+        className="bg-white shadow-lg rounded-lg p-6"
+        onSubmit={handleSubmit(handleFormSubmit)}
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Create New Survey
+        </h2>
+        <input
+          className="input mb-4 p-2 border border-gray-300 rounded w-full"
+          {...register('title')}
+          placeholder="Survey title"
+          required
+        />
+        <div className="flex justify-center mb-4 space-x-6">
+          <label className="flex items-center">
             <input
-              className="input mb-2 p-2 border border-gray-300 rounded w-full"
-              {...register(`questions.${index}.answerOptions`)}
-              placeholder="Варианты ответов (через запятую)"
+              type="radio"
+              {...register('flag')}
+              value="private"
               required
             />
-          )}
-
-          <button
-            type="button"
-            className="remove-question-button text-red-600 hover:text-red-500"
-            onClick={() => remove(index)}
-          >
-            Удалить вопрос
-          </button>
+            <span className="ml-2">Private</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" {...register('flag')} value="public" />
+            <span className="ml-2">Public</span>
+          </label>
         </div>
-      ))}
-
-      <button
-        type="button"
-        className="add-question-button bg-indigo-600 text-white rounded py-2 px-4 mb-4 hover:bg-indigo-500 transition duration-300" // Новые цвета для кнопки "Добавить вопрос"
-        onClick={() =>
-          append({
-            questionText: '',
-            answerOptions: '',
-            answerType: 'single',
-          })
-        }
-      >
-        Добавить вопрос
-      </button>
-
-      <button
-        type="submit"
-        className="submit-button bg-teal-600 text-white rounded py-2 mb-4 w-full hover:bg-teal-500 transition duration-300" // Новые цвета для кнопки "Создать опрос"
-      >
-        Создать опрос
-      </button>
-    </form>
+        <h3 className="text-lg font-semibold mb-2">Questions</h3>
+        {fields.map((item, index) => (
+          <div key={item.id} className="mb-4">
+            <input
+              className="input mb-2 p-2 border border-gray-300 rounded w-full"
+              {...register(`questions.${index}.questionText`)}
+              placeholder="Question text"
+              required
+            />
+            <select
+              {...register(`questions.${index}.answerType`)}
+              className="input mb-2 p-2 border border-gray-300 rounded w-full"
+            >
+              <option value="single">Single Choice</option>
+              <option value="multiple">Multiple Choices</option>
+              <option value="open">Open Question</option>
+            </select>
+            {['single', 'multiple'].includes(
+              answerTypes[index]?.answerType,
+            ) && (
+              <input
+                className="input mb-2 p-2 border border-gray-300 rounded w-full"
+                {...register(`questions.${index}.answerOptions`)}
+                placeholder="Answer options (comma-separated)"
+                required
+              />
+            )}
+            <button
+              type="button"
+              className="remove-question-button text-red-600 hover:text-red-500"
+              onClick={() => {
+                if (fields.length > 1) {
+                  remove(index);
+                } else {
+                  toast.error('You must have at least one question.'); // Notification when trying to remove the last question
+                }
+              }}
+            >
+              Remove Question
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="add-question-button bg-indigo-600 text-white rounded py-2 px-4 mb-4 hover:bg-indigo-500 transition duration-300"
+          onClick={() =>
+            append({
+              questionText: '',
+              answerOptions: '',
+              answerType: 'single',
+            })
+          }
+        >
+          Add Question
+        </button>
+        <button
+          type="submit"
+          className="submit-button bg-teal-600 text-white rounded py-2 mb-4 w-full hover:bg-teal-500 transition duration-300"
+        >
+          Create Survey
+        </button>
+      </form>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        draggable
+        pauseOnHover
+      />
+    </div>
   );
 };
 

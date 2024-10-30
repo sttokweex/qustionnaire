@@ -1,4 +1,3 @@
-// components/QuestionNumbers.tsx
 import React from 'react';
 import { QuestionNumbersProps } from './interfaces';
 

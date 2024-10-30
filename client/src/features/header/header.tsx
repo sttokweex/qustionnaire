@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ username, onRefetch }) => {
         onClick={handleLogout}
         className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition duration-300"
       >
-        Выйти
+        Logout
       </button>
     </header>
   );

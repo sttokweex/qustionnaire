@@ -1,7 +1,7 @@
-// components/QuestionPage.tsx
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Header from '@/features/header/header'; // Импортируем Header
+import { toast, ToastContainer } from 'react-toastify';
+import Header from '@/features/header/header';
 import { useSubmitSurveyMutation } from '@/shared/http';
 import Question from './components/question/Question';
 import QuestionNavigation from './components/questionNavigate/QuestionNavigation';
@@ -9,13 +9,14 @@ import QuestionNumbers from './components/questionNumbers/QuestionNumbers';
 import SurveyResults from './components/surveyResult/SurveyResults';
 import { useSurvey } from './hooks/useSurvey';
 import { QuestionPageProps } from './interfaces';
+import 'react-toastify/dist/ReactToastify.css';
 
 const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
   const { surveyTitle } = useParams<{ surveyTitle: string }>();
   const navigate = useNavigate();
 
   if (!surveyTitle) {
-    return <div>Ошибка: заголовок отсутствует.</div>;
+    return <div>Error: title is missing.</div>;
   }
 
   const {
@@ -24,8 +25,10 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
     currentQuestionIndex,
     setCurrentQuestionIndex,
     userAnswers,
-    selectedOptions,
-    setSelectedOptions,
+    singleSelectedOption,
+    setSingleSelectedOption,
+    multipleSelectedOptions,
+    setMultipleSelectedOptions,
     openAnswer,
     setOpenAnswer,
     surveyCompleted,
@@ -36,23 +39,23 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
 
   const submitSurveyMutation = useSubmitSurveyMutation();
 
-  if (isLoading) return <div>Загрузка...</div>;
+  if (isLoading) return <div>Loading...</div>;
 
-  if (error) return <div>Ошибка при загрузке вопросов: {error.message}</div>;
+  if (error) return <div>Error loading questions: {error.message}</div>;
 
-  if (!questions.length) return <div>Нет доступных вопросов.</div>;
+  if (!questions.length) return <div>No questions available.</div>;
 
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleOptionChange = (option: string) => {
     if (currentQuestion.answerType === 'multiple') {
-      setSelectedOptions((prev) =>
+      setMultipleSelectedOptions((prev) =>
         prev.includes(option)
           ? prev.filter((o) => o !== option)
           : [...prev, option],
       );
     } else {
-      setSelectedOptions([option]);
+      setSingleSelectedOption(option);
     }
   };
 
@@ -108,40 +111,47 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
               : result.userAnswer || '',
           })),
         });
-        console.log('Ответ от сервера:', submitSurveyMutation.data);
+        toast.success('Survey results successfully submitted!');
+
+        setTimeout(() => {
+          navigate(-1);
+        }, 2000);
       } catch (error) {
-        console.error('Ошибка при отправке результатов опроса:', error);
-      } finally {
-        navigate(-1);
+        toast.error('Error submitting survey results. Please try again.');
       }
     }
   };
 
-  const isAllAnswered = questions.every(
-    (q) =>
-      userAnswers[q.id] !== undefined &&
-      userAnswers[q.id] !== '' &&
-      userAnswers[q.id].length !== 0,
-  );
+  const isAllAnswered = questions.every((q) => {
+    const answer = userAnswers[q.id];
+
+    return (
+      answer !== undefined &&
+      answer !== '' &&
+      (Array.isArray(answer) ? answer.length !== 0 : true)
+    );
+  });
 
   return (
     <>
       <Header username={userData.username} onRefetch={refetch} />
-      {/* Добавлена шапка */}
+
       <div className="max-w-xl mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-center mb-2 text-purple-800">
-          Опрос: {surveyTitle}
+          Survey: {surveyTitle}
         </h1>
         {!surveyCompleted ? (
           <>
             <Question
               question={currentQuestion}
               answers={answers}
-              selectedOptions={selectedOptions}
-              onOptionChange={handleOptionChange}
+              singleSelectedOption={singleSelectedOption}
+              multipleSelectedOptions={multipleSelectedOptions}
               openAnswer={openAnswer}
               setOpenAnswer={setOpenAnswer}
+              onOptionChange={handleOptionChange}
             />
+
             <QuestionNavigation
               currentQuestionIndex={currentQuestionIndex}
               onPrev={handlePrevQuestion}
@@ -155,12 +165,12 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
               currentQuestionIndex={currentQuestionIndex}
               onClick={setCurrentQuestionIndex}
             />
-            {/* Кнопка перемещена вниз */}
+
             <button
               onClick={() => navigate(-1)}
               className="mt-4 px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-300"
             >
-              К опросам
+              Back to Surveys
             </button>
           </>
         ) : (
@@ -171,6 +181,11 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
           />
         )}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+      />
     </>
   );
 };

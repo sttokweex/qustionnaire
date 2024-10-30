@@ -16,7 +16,13 @@ export const useSurvey = (surveyTitle: string) => {
   const [userAnswers, setUserAnswers] = useState<{
     [key: string]: string | string[];
   }>({});
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  const [singleSelectedOption, setSingleSelectedOption] = useState<
+    string | null
+  >(null);
+  const [multipleSelectedOptions, setMultipleSelectedOptions] = useState<
+    string[]
+  >([]);
   const [openAnswer, setOpenAnswer] = useState<string>('');
   const [surveyCompleted, setSurveyCompleted] = useState<boolean>(false);
 
@@ -27,7 +33,6 @@ export const useSurvey = (surveyTitle: string) => {
       const parsedAnswers = JSON.parse(savedAnswers);
       setUserAnswers(parsedAnswers);
 
-      // Проверка на наличие вопросов
       if (data?.questions && currentQuestionIndex < data.questions.length) {
         const currentQuestionId = data.questions[currentQuestionIndex]?.id;
 
@@ -35,9 +40,10 @@ export const useSurvey = (surveyTitle: string) => {
           const previousAnswer = parsedAnswers[currentQuestionId];
 
           if (Array.isArray(previousAnswer)) {
-            setSelectedOptions(previousAnswer);
+            setMultipleSelectedOptions(previousAnswer);
           } else {
             setOpenAnswer(previousAnswer || '');
+            setSingleSelectedOption(previousAnswer || null);
           }
         }
       }
@@ -59,11 +65,25 @@ export const useSurvey = (surveyTitle: string) => {
 
       if (currentQuestion.answerType === 'open') {
         setUserAnswers((prev) => ({ ...prev, [answerKey]: openAnswer }));
-      } else {
-        setUserAnswers((prev) => ({ ...prev, [answerKey]: selectedOptions }));
+      } else if (currentQuestion.answerType === 'single') {
+        setUserAnswers((prev) => ({
+          ...prev,
+          [answerKey]: singleSelectedOption,
+        }));
+      } else if (currentQuestion.answerType === 'multiple') {
+        setUserAnswers((prev) => ({
+          ...prev,
+          [answerKey]: multipleSelectedOptions,
+        }));
       }
     }
-  }, [openAnswer, selectedOptions, currentQuestionIndex, data]);
+  }, [
+    openAnswer,
+    singleSelectedOption,
+    multipleSelectedOptions,
+    currentQuestionIndex,
+    data,
+  ]);
 
   const questions: Question[] = data?.questions || [];
   const answers: Answer[] = data?.answers || [];
@@ -76,8 +96,10 @@ export const useSurvey = (surveyTitle: string) => {
     setCurrentQuestionIndex,
     userAnswers,
     setUserAnswers,
-    selectedOptions,
-    setSelectedOptions,
+    singleSelectedOption,
+    setSingleSelectedOption,
+    multipleSelectedOptions,
+    setMultipleSelectedOptions,
     openAnswer,
     setOpenAnswer,
     surveyCompleted,

@@ -1,19 +1,17 @@
-// components/QuestionComponent.tsx
 import React from 'react';
 import { QuestionProps } from './interfaces';
 
 const QuestionComponent: React.FC<QuestionProps> = ({
   question,
   answers,
-  selectedOptions,
+  singleSelectedOption,
+  multipleSelectedOptions,
   openAnswer,
   setOpenAnswer,
   onOptionChange,
 }) => {
   return (
     <div className="question-container my-6 p-6 bg-white rounded-lg shadow-lg transition hover:shadow-xl min-h-[200px]">
-      {' '}
-      {/* Установлена минимальная высота */}
       <h2 className="question-title text-2xl font-semibold mb-4 text-gray-900">
         {question.questionText}
       </h2>
@@ -36,7 +34,7 @@ const QuestionComponent: React.FC<QuestionProps> = ({
                 <input
                   type="checkbox"
                   value={answer.answerText}
-                  checked={selectedOptions.includes(answer.answerText)}
+                  checked={multipleSelectedOptions.includes(answer.answerText)}
                   onChange={() => onOptionChange(answer.answerText)}
                   className="mr-2 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                 />
@@ -45,7 +43,7 @@ const QuestionComponent: React.FC<QuestionProps> = ({
                   type="radio"
                   name={`question-${question.id}`}
                   value={answer.answerText}
-                  checked={selectedOptions.includes(answer.answerText)}
+                  checked={singleSelectedOption === answer.answerText}
                   onChange={() => onOptionChange(answer.answerText)}
                   className="mr-2 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                 />

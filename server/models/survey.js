@@ -17,7 +17,6 @@ const Survey = sequelize.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     hidden: {
       type: DataTypes.BOOLEAN,

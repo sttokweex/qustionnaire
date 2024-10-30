@@ -42,6 +42,7 @@ const routes = async (fastify) => {
   fastify.post('/addSurveyTheme', questionareController.addTheme);
   fastify.post('/addSurvey', questionareController.addSurvey);
   fastify.post('/endSurvey', questionareController.submitSurvey);
+  fastify.post('/toggleVisible', questionareController.toggleSurveyVisibility);
   fastify.get('/', async function handler() {
     return { hello: 'world' };
   });

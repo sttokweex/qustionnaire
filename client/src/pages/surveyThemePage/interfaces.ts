@@ -6,8 +6,10 @@ interface UserData {
   role: string;
 }
 export interface Survey {
+  id: number;
   title: string;
   isCompleted: boolean;
+  hidden: boolean;
 }
 export interface SurveyThemePageProps {
   userData: UserData;
