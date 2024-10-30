@@ -5,11 +5,7 @@ import { useLoginMutation, useRegistrationMutation } from '@/shared/http';
 import InputField from './components/inputField/inputField';
 import ToggleFormButton from './components/toggleFormButton/toggleFormButton';
 import 'react-toastify/dist/ReactToastify.css';
-
-type FormData = {
-  username: string;
-  password: string;
-};
+import { FormData } from './interfaces';
 
 const AuthPage: FC = () => {
   const [isLogin, setIsLogin] = useState(true);
