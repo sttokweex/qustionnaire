@@ -6,11 +6,12 @@ const routes = async (fastify) => {
   fastify.post('/registration', authController.registration);
   fastify.post('/login', authController.login);
   fastify.post('/logout', authController.logout);
+  fastify.get('/refresh', authController.refresh);
   fastify.post('/survey', questionareController.getQuestions);
   fastify.post('/addSurveyTheme', questionareController.addTheme);
   fastify.post('/addSurvey', questionareController.addSurvey);
   fastify.post('/endSurvey', questionareController.submitSurvey);
-  fastify.get('/refresh', authController.refresh);
+  fastify.post('/toggleVisible', questionareController.toggleSurveyVisibility);
   fastify.post(
     '/surveys',
     {
@@ -19,10 +20,7 @@ const routes = async (fastify) => {
     questionareController.getSurveys,
   );
 
-  fastify.post('/addSurveyTheme', questionareController.addTheme);
-  fastify.post('/addSurvey', questionareController.addSurvey);
-  fastify.post('/endSurvey', questionareController.submitSurvey);
-  fastify.post('/toggleVisible', questionareController.toggleSurveyVisibility);
+  fastify.get('/surveyThemes', questionareController.getThemes);
 };
 
 export default routes;

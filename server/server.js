@@ -22,7 +22,7 @@ const app = fastify();
 
   app.listen({ port: 3000, host: '0.0.0.0' }, (err) => {
     if (err) {
-      fastify.log.error(err);
+      console.log(err);
       process.exit(1);
     }
     console.log(`server listening on ${app.server.address().port}`);

@@ -115,7 +115,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
 
         setTimeout(() => {
           navigate(-1);
-        }, 2000);
+        }, 500);
       } catch (error) {
         toast.error('Error submitting survey results. Please try again.');
       }

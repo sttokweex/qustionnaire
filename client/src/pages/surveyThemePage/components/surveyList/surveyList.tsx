@@ -26,11 +26,7 @@ const SurveyList: React.FC<SurveyListProps> = ({
   const [showCompleted, setShowCompleted] = useState(true); // Состояние для показа завершённых опросов
 
   if (!Array.isArray(surveys) || surveys.length === 0) {
-    return (
-      <div className="text-center text-gray-600">
-        Нет опросов для этой темы.
-      </div>
-    );
+    return <div className="text-center text-gray-600">No surveys</div>;
   }
 
   const handleToggleVisibility = (surveyId: number) => {
@@ -47,7 +43,7 @@ const SurveyList: React.FC<SurveyListProps> = ({
     <div>
       <div className="flex items-center justify-end mb-4">
         <label className="inline-flex items-center cursor-pointer">
-          <span className="mr-2 text-gray-700">Скрыть завершённые опросы</span>
+          <span className="mr-2 text-gray-700">Hide completed surveys</span>
           <span className="relative">
             <input
               type="checkbox"
