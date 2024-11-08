@@ -12,10 +12,14 @@ import { QuestionPageProps } from './interfaces';
 import 'react-toastify/dist/ReactToastify.css';
 
 const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
-  const { surveyTitle } = useParams<{ surveyTitle: string }>();
+  const { surveyTitle, title } = useParams<{
+    surveyTitle: string;
+    title: string;
+  }>();
+
   const navigate = useNavigate();
 
-  if (!surveyTitle) {
+  if (!surveyTitle || !title) {
     return <div>Error: title is missing.</div>;
   }
 
@@ -102,6 +106,7 @@ const QuestionPage: React.FC<QuestionPageProps> = ({ userData, refetch }) => {
         await submitSurveyMutation.mutateAsync({
           endedSurvey: {
             surveyTitle: surveyTitle,
+            title: title,
             userId: userData.id,
           },
           answerStats: results.map((result) => ({

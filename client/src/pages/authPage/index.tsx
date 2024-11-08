@@ -24,7 +24,8 @@ const AuthPage: FC = () => {
       }
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || 'An error occurred. Please try again.',
+        error?.response?.data?.message ||
+          'An error occurred. Please try again.',
       );
     }
   };
@@ -46,7 +47,7 @@ const AuthPage: FC = () => {
               register={register}
               name="password"
               placeholder="Password"
-              type="password"
+              type="password" // Исправлено
             />
           </div>
           <button

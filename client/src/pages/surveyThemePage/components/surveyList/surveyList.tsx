@@ -15,28 +15,31 @@ const SurveyList: React.FC<SurveyListProps> = ({
     [key: number]: boolean;
   };
 
-  const [surveyVisibility, setSurveyVisibility] = useState<VisibilityState>(
-    surveys.reduce((acc, survey) => {
-      acc[survey.id] = !survey.hidden;
+  // Проводим проверку, чтобы убедиться, что surveys — это массив
+  const initialVisibility = Array.isArray(surveys)
+    ? surveys.reduce((acc, survey) => {
+        acc[survey.id] = !survey.hidden;
 
-      return acc;
-    }, {} as VisibilityState),
-  );
+        return acc;
+      }, {} as VisibilityState)
+    : {};
 
+  const [surveyVisibility, setSurveyVisibility] =
+    useState<VisibilityState>(initialVisibility);
   const [showCompleted, setShowCompleted] = useState(true); // Состояние для показа завершённых опросов
 
   if (!Array.isArray(surveys) || surveys.length === 0) {
-    return <div className="text-center text-gray-600">No surveys</div>;
+    return <div className="text-center text-gray-600">No surveys</div>; // Сообщение, если опросов нет
   }
 
   const handleToggleVisibility = (surveyId: number) => {
     const newVisibility = !surveyVisibility[surveyId];
     toggleSurveyVisibility({ surveyId });
-    setSurveyVisibility({ ...surveyVisibility, [surveyId]: newVisibility });
+    setSurveyVisibility((prev) => ({ ...prev, [surveyId]: newVisibility }));
   };
 
   const handleToggleShowCompleted = () => {
-    setShowCompleted(!showCompleted);
+    setShowCompleted((prev) => !prev);
   };
 
   return (
@@ -90,7 +93,7 @@ const SurveyList: React.FC<SurveyListProps> = ({
                     <span className="relative">
                       <input
                         type="checkbox"
-                        checked={surveyVisibility[survey.id]}
+                        checked={surveyVisibility[survey.id] || false} // Убедитесь, что значение по умолчанию - false
                         onChange={() => handleToggleVisibility(survey.id)}
                         className="absolute opacity-0 peer"
                       />

@@ -246,7 +246,7 @@ const useSubmitSurveyMutation = (): UseMutationResult<
   SurveyResponse,
   unknown,
   {
-    endedSurvey: { surveyTitle: string; userId: number };
+    endedSurvey: { surveyTitle: string; title: string; userId: number };
     answerStats: {
       questionId: number;
       answerText: string;
@@ -256,7 +256,7 @@ const useSubmitSurveyMutation = (): UseMutationResult<
 > => {
   return useMutation(
     async (data: {
-      endedSurvey: { surveyTitle: string; userId: number };
+      endedSurvey: { surveyTitle: string; title: string; userId: number };
       answerStats: {
         questionId: number;
         answerText: string;

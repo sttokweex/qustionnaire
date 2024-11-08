@@ -217,15 +217,21 @@ class QuestionareController {
       let surveyId;
 
       if (endedSurvey) {
-        const { surveyTitle, userId } = endedSurvey;
+        const { surveyTitle, title, userId } = endedSurvey;
 
-        if (!surveyTitle || !userId) {
+        if (!surveyTitle || !userId || !title) {
           throw ApiError.BadRequest(
             'All fields for EndedSurveys must be filled',
           );
         }
+        const surveyTheme = await SurveyThemes.findOne({ where: { title } });
 
-        const survey = await Survey.findOne({ where: { title: surveyTitle } });
+        if (!surveyTheme) {
+          throw ApiError.NotFound('SurveyTheme not found');
+        }
+        const survey = await Survey.findOne({
+          where: { title: surveyTitle, themeId: surveyTheme.id },
+        });
 
         if (!survey) {
           throw ApiError.NotFound('Survey not found');
