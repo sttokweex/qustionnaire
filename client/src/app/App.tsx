@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BrowserRouter as Router,
   Route,
@@ -20,10 +20,13 @@ const App: FC = () => {
   const {
     data: userData,
     isLoading,
-    error,
     refetch,
-  } = useQuery<UserData | undefined>('user', () => {
-    return queryClient.getQueryData<UserData>('user');
+  } = useQuery<UserData | undefined>({
+    queryKey: ['user'],
+    queryFn: () => {
+      return queryClient.getQueryData<UserData>(['user']);
+    },
+    staleTime: Infinity,
   });
 
   const mutationLogout = useLogoutMutation(refetch);
@@ -34,7 +37,10 @@ const App: FC = () => {
     if (token) {
       refreshToken()
         .then((response) => {
-          queryClient.setQueryData('user', response.user);
+          if (response.user) {
+            queryClient.setQueryData(['user'], response.user);
+          } else {
+          }
         })
         .catch(() => {
           mutationLogout.mutate();
@@ -49,10 +55,6 @@ const App: FC = () => {
 
   if (isAuthLoading || isLoading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading user data</div>;
   }
 
   return (

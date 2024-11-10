@@ -4,7 +4,8 @@ import {
   UseMutationResult,
   useQuery,
   useQueryClient,
-} from 'react-query';
+  UseQueryResult,
+} from '@tanstack/react-query';
 import {
   AuthResponse,
   LoginData,
@@ -48,9 +49,9 @@ const useLoginMutation = (): UseMutationResult<
 > => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async (data: LoginData): Promise<AuthResponse> => {
-      const res = await axiosInstance.post<AuthResponse>(`/login`, data, {
+  return useMutation<AuthResponse, unknown, LoginData>({
+    mutationFn: async (data: LoginData): Promise<AuthResponse> => {
+      const res = await axiosInstance.post<AuthResponse>('/login', data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -59,19 +60,17 @@ const useLoginMutation = (): UseMutationResult<
 
       return res.data;
     },
-    {
-      onSuccess: (response) => {
-        queryClient.setQueryData('user', response.user);
-        localStorage.setItem(
-          'token',
-          JSON.stringify({
-            token: response.accessToken,
-            exp: response.expirationTime,
-          }),
-        );
-      },
+    onSuccess: (response) => {
+      queryClient.setQueryData(['user'], response.user);
+      localStorage.setItem(
+        'token',
+        JSON.stringify({
+          token: response.accessToken,
+          exp: response.expirationTime,
+        }),
+      );
     },
-  );
+  });
 };
 
 const useRegistrationMutation = (): UseMutationResult<
@@ -81,117 +80,106 @@ const useRegistrationMutation = (): UseMutationResult<
 > => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async (data: LoginData): Promise<AuthResponse> => {
+  return useMutation<AuthResponse, unknown, LoginData>({
+    mutationFn: async (data: LoginData): Promise<AuthResponse> => {
       const res = await axiosInstance.post<AuthResponse>(
-        `/registration`,
+        '/registration',
         data,
         {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true,
         },
       );
-
       return res.data;
     },
-    {
-      onSuccess: (response) => {
-        queryClient.setQueryData('user', response.user);
+    onSuccess: (response) => {
+      queryClient.setQueryData(['user'], response.user);
 
-        localStorage.setItem(
-          'token',
-          JSON.stringify({
-            token: response.accessToken,
-            exp: response.expirationTime,
-          }),
-        );
-      },
+      localStorage.setItem(
+        'token',
+        JSON.stringify({
+          token: response.accessToken,
+          exp: response.expirationTime,
+        }),
+      );
     },
-  );
+  });
 };
 
 const useLogoutMutation = (
   refetchUserData: () => void,
-): UseMutationResult<void, unknown, void, unknown> => {
+): UseMutationResult<void, unknown, void> => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    (): Promise<void> => {
-      return axiosInstance.post(`/logout`, null, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  return useMutation<void>({
+    mutationFn: async (): Promise<void> => {
+      await axiosInstance.post('/logout', null, {
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
     },
-    {
-      onSuccess: () => {
-        queryClient.removeQueries('user');
-        localStorage.clear();
-        refetchUserData();
-      },
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['user'] });
+      localStorage.clear();
+      refetchUserData();
     },
-  );
-};
-
-const useSurveyThemes = () => {
-  return useQuery<SurveyTheme[], Error>('surveyThemes', async () => {
-    const response = await axios.get<SurveyTheme[]>(`${API_URL}/surveyThemes`, {
-      withCredentials: true,
-    });
-
-    return response.data;
   });
 };
 
-const useSurveysByTheme = (title: string) => {
-  return useQuery<Survey[], Error>(['surveys', title], async () => {
-    const response = await axiosInstance.post<Survey[]>(
-      `/surveys`,
-      { title },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+const useSurveyThemes = (): UseQueryResult<SurveyTheme[], Error> => {
+  return useQuery<SurveyTheme[], Error>({
+    queryKey: ['surveyThemes'],
+    queryFn: async () => {
+      const response = await axiosInstance.get<SurveyTheme[]>('/surveyThemes', {
         withCredentials: true,
-      },
-    );
-
-    return response.data;
+      });
+      return response.data;
+    },
   });
 };
-const useAddSurveyThemeMutation = (): UseMutationResult<
-  SurveyTheme,
-  unknown,
-  { title: string },
-  unknown
-> => {
-  const queryClient = useQueryClient();
 
-  return useMutation(
-    async (data: { title: string }): Promise<SurveyTheme> => {
-      const res = await axiosInstance.post<SurveyTheme>(
-        `/addSurveyTheme`,
-        data,
+const useSurveysByTheme = (title: string): UseQueryResult<Survey[], Error> => {
+  return useQuery<Survey[], Error>({
+    queryKey: ['surveys', title],
+    queryFn: async () => {
+      const response = await axiosInstance.post<Survey[]>(
+        '/surveys',
+        { title },
         {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true,
         },
       );
+      return response.data;
+    },
+  });
+};
 
+const useAddSurveyThemeMutation = (): UseMutationResult<
+  SurveyTheme,
+  unknown,
+  { title: string }
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<SurveyTheme, unknown, { title: string }>({
+    mutationFn: async (data: { title: string }): Promise<SurveyTheme> => {
+      const res = await axiosInstance.post<SurveyTheme>(
+        '/addSurveyTheme',
+        data,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        },
+      );
       return res.data;
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('surveyThemes');
-      },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['surveyThemes'] });
     },
-  );
+  });
 };
+
 const useAddSurveyMutation = (): UseMutationResult<
   Survey,
   unknown,
@@ -199,102 +187,95 @@ const useAddSurveyMutation = (): UseMutationResult<
     survey: { title: string; questions: Question[] };
     themeTitle: string;
     flag: boolean;
-  },
-  unknown
+  }
 > => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async (data: {
+  return useMutation<
+    Survey,
+    unknown,
+    {
       survey: { title: string; questions: Question[] };
       themeTitle: string;
       flag: boolean;
-    }): Promise<Survey> => {
-      const res = await axiosInstance.post<Survey>(`/addSurvey`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    }
+  >({
+    mutationFn: async (data): Promise<Survey> => {
+      const res = await axiosInstance.post<Survey>('/addSurvey', data, {
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-
       return res.data;
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('survey');
-      },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['surveys'] });
     },
-  );
-};
-const useGetQuestions = (title: string) => {
-  return useQuery<SurveyResponse, Error>(['surveys', title], async () => {
-    const response = await axiosInstance.post<SurveyResponse>(
-      `/survey`,
-      { title },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      },
-    );
-
-    return response.data;
   });
 };
+
+const useGetQuestions = (
+  title: string,
+): UseQueryResult<SurveyResponse, Error> => {
+  return useQuery<SurveyResponse, Error>({
+    queryKey: ['survey', title],
+    queryFn: async () => {
+      const response = await axiosInstance.post<SurveyResponse>(
+        '/survey',
+        { title },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        },
+      );
+      return response.data;
+    },
+  });
+};
+
 const useSubmitSurveyMutation = (): UseMutationResult<
   SurveyResponse,
   unknown,
   {
     endedSurvey: { surveyTitle: string; title: string; userId: number };
-    answerStats: {
-      questionId: number;
-      answerText: string;
-    }[];
-  },
-  unknown
+    answerStats: { questionId: number; answerText: string }[];
+  }
 > => {
-  return useMutation(
-    async (data: {
+  return useMutation<
+    SurveyResponse,
+    unknown,
+    {
       endedSurvey: { surveyTitle: string; title: string; userId: number };
-      answerStats: {
-        questionId: number;
-        answerText: string;
-      }[];
-    }): Promise<SurveyResponse> => {
-      const res = await axiosInstance.post<SurveyResponse>(`/endSurvey`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      answerStats: { questionId: number; answerText: string }[];
+    }
+  >({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post<SurveyResponse>('/endSurvey', data, {
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-
       return res.data;
     },
-  );
+  });
 };
+
 const useToggleSurveyVisibilityMutation = (): UseMutationResult<
   { hidden: boolean },
   unknown,
-  { surveyId: number },
-  unknown
+  { surveyId: number }
 > => {
-  return useMutation(
-    async (data: { surveyId: number }): Promise<{ hidden: boolean }> => {
+  return useMutation<{ hidden: boolean }, unknown, { surveyId: number }>({
+    mutationFn: async (data) => {
       const res = await axiosInstance.post<{ hidden: boolean }>(
-        `/toggleVisible`,
+        '/toggleVisible',
         data,
         {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true,
         },
       );
-
       return res.data;
     },
-  );
+  });
 };
 
 export {

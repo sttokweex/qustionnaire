@@ -112,7 +112,6 @@ class authController {
 
       return { message: 'Successfully logged out' };
     } catch (e) {
-      console.error(e);
       reply.status(400).send({ message: 'Logout error' });
     }
   }
@@ -130,7 +129,7 @@ class authController {
 
       if (!userData || !tokenFromDb) {
         await tokenService.removeToken(refreshToken);
-        throw ApiError.UnauthorizedError('Unauthorized');
+        throw ApiError.UnauthorizedError('no');
       }
 
       const user = await User.findOne({ where: { id: userData.id } });

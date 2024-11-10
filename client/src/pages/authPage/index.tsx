@@ -47,7 +47,7 @@ const AuthPage: FC = () => {
               register={register}
               name="password"
               placeholder="Password"
-              type="password" // Исправлено
+              type="password"
             />
           </div>
           <button

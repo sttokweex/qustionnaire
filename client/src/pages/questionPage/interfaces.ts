@@ -1,4 +1,4 @@
-import { QueryObserverResult } from 'react-query';
+import { QueryObserverResult } from '@tanstack/react-query';
 
 export interface Question {
   id: number;
