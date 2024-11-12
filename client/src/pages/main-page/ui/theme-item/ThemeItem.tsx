@@ -1,10 +1,10 @@
 // ThemeItem.tsx
-import { Theme } from '@/shared/types/interfaces';
+import { SurveyTheme } from '@/shared/types/interfaces';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 interface ThemeItemProps {
-  theme: Theme;
+  theme: SurveyTheme;
   onDelete?: (id: string) => void;
 }
 

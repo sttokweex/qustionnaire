@@ -10,10 +10,7 @@ export interface Question {
   answerOptions: string[];
   answerType: string;
 }
-export interface Theme {
-  id: string;
-  title: string;
-}
+
 export interface AuthResponse {
   accessToken: string;
   expirationTime: number;
@@ -29,7 +26,7 @@ export interface Answer {
   answerText: string;
 }
 export interface SurveyTheme {
-  id: number;
+  id: string;
   title: string;
 }
 export interface Survey {

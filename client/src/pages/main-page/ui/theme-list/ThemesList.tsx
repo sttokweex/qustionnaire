@@ -1,10 +1,10 @@
 // ThemesList.tsx
-import { Theme } from '@/shared/types/interfaces';
+import { SurveyTheme } from '@/shared/types/interfaces';
 import React from 'react';
 import ThemeItem from '../theme-item/ThemeItem';
 
 const ThemesList: React.FC<{
-  themes: Theme[];
+  themes: SurveyTheme[];
   onDelete?: (id: string) => void;
 }> = ({ themes, onDelete }) => {
   return (
