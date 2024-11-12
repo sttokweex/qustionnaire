@@ -4,6 +4,11 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  settings: {
+    react: {
+      version: '18.2.0', // Укажите вашу версию React
+    },
+  },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -27,9 +32,11 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
+
   rules: {
+    'react/prop-types': 'off',
     'no-var': 'error',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'on',
     'prefer-const': 'warn',
     'prettier/prettier': [
       'warn',

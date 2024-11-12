@@ -1,5 +1,5 @@
 import { refreshToken } from './http';
-import { TokenData } from './interfaces';
+import { TokenData } from './types/interfaces';
 
 export const checkAccess = async (): Promise<string | null> => {
   const tokenData = localStorage.getItem('token');

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   useMutation,
   UseMutationResult,
@@ -6,6 +5,7 @@ import {
   useQueryClient,
   UseQueryResult,
 } from '@tanstack/react-query';
+import axios from 'axios';
 import {
   AuthResponse,
   LoginData,
@@ -13,7 +13,7 @@ import {
   Survey,
   SurveyResponse,
   SurveyTheme,
-} from '../interfaces';
+} from '../types/interfaces';
 import axiosInstance from '@/api/axiosInstance';
 
 const API_URL: string = import.meta.env.VITE_DEV_PORT || '';
@@ -90,6 +90,7 @@ const useRegistrationMutation = (): UseMutationResult<
           withCredentials: true,
         },
       );
+
       return res.data;
     },
     onSuccess: (response) => {
@@ -133,6 +134,7 @@ const useSurveyThemes = (): UseQueryResult<SurveyTheme[], Error> => {
       const response = await axiosInstance.get<SurveyTheme[]>('/surveyThemes', {
         withCredentials: true,
       });
+
       return response.data;
     },
   });
@@ -150,6 +152,7 @@ const useSurveysByTheme = (title: string): UseQueryResult<Survey[], Error> => {
           withCredentials: true,
         },
       );
+
       return response.data;
     },
   });
@@ -172,6 +175,7 @@ const useAddSurveyThemeMutation = (): UseMutationResult<
           withCredentials: true,
         },
       );
+
       return res.data;
     },
     onSuccess: () => {
@@ -205,6 +209,7 @@ const useAddSurveyMutation = (): UseMutationResult<
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
+
       return res.data;
     },
     onSuccess: () => {
@@ -227,6 +232,7 @@ const useGetQuestions = (
           withCredentials: true,
         },
       );
+
       return response.data;
     },
   });
@@ -253,6 +259,7 @@ const useSubmitSurveyMutation = (): UseMutationResult<
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
+
       return res.data;
     },
   });
@@ -273,6 +280,7 @@ const useToggleSurveyVisibilityMutation = (): UseMutationResult<
           withCredentials: true,
         },
       );
+
       return res.data;
     },
   });
