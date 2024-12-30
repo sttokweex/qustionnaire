@@ -291,13 +291,18 @@ class QuestionareController {
     }
   };
   toggleSurveyVisibility = async (request, reply) => {
-    const { surveyId } = request.body;
+    const { surveyTitle, themeTitle } = request.body;
 
-    if (!surveyId) {
-      throw ApiError.BadRequest('Survey ID is required');
+    if (!surveyTitle) {
+      throw ApiError.BadRequest('Survey is required');
     }
     try {
-      const survey = await Survey.findOne({ where: { id: surveyId } });
+      const theme = await SurveyThemes.findOne({
+        where: { title: themeTitle },
+      });
+      const survey = await Survey.findOne({
+        where: { title: surveyTitle, themeId: theme.id },
+      });
 
       if (!survey) {
         throw ApiError.NotFound('Survey not found');
