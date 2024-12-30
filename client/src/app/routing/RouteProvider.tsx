@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import AuthPage from '@/pages/auth-page';
-import MainPage from '@/pages/main-page';
-import QuestionPage from '@/pages/question-page';
-import SurveyThemePage from '@/pages/survey-theme-page';
-import PrivateRoute from '@/features/auth/protectedRoute';
+import { MainPage } from '@/pages/main-page';
+import { QuestionPage } from '@/pages/question-page';
+import { SurveyThemePage } from '@/pages/survey-theme-page';
+import PrivateRoute from '@/app/routing/protectedRoute';
 import useAuth from '@/features/auth/useAuth';
+import { AuthPage } from '@/pages/auth-page';
 
 const RouteProvider: FC = () => {
   const { userData, refetch, isAuthLoading, isLoading } = useAuth();

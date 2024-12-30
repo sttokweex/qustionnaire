@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { checkAccess } from '@/shared/checkAcces';
-
-const API_URL: string = import.meta.env.VITE_DEV_PORT;
+import { API_URL } from '@/shared/constants/config';
 
 const axiosInstance = axios.create({
   baseURL: API_URL,

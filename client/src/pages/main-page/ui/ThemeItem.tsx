@@ -1,5 +1,4 @@
-// ThemeItem.tsx
-import { SurveyTheme } from '@/shared/types/interfaces';
+import { SurveyTheme } from '@/entity/surveyTheme';
 import React from 'react';
 import { Link } from 'react-router-dom';
 

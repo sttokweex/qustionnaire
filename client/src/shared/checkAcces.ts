@@ -1,5 +1,5 @@
+import { TokenData } from '@/entity/token';
 import { refreshToken } from './http';
-import { TokenData } from './types/interfaces';
 
 export const checkAccess = async (): Promise<string | null> => {
   const tokenData = localStorage.getItem('token');
@@ -20,6 +20,5 @@ export const checkAccess = async (): Promise<string | null> => {
       return token;
     }
   }
-
   return null;
 };

@@ -1,12 +1,13 @@
 // ThemesList.tsx
-import { SurveyTheme } from '@/shared/types/interfaces';
-import React from 'react';
-import ThemeItem from '../theme-item/ThemeItem';
 
-const ThemesList: React.FC<{
+import React from 'react';
+import ThemeItem from './ThemeItem';
+import { SurveyTheme } from '@/entity/surveyTheme';
+interface ThemesListProps {
   themes: SurveyTheme[];
   onDelete?: (id: string) => void;
-}> = ({ themes, onDelete }) => {
+}
+const ThemesList: React.FC<ThemesListProps> = ({ themes, onDelete }) => {
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 h-full">
       {themes.length === 0 ? (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useGetQuestions } from '@/shared/http';
-import { Answer, Question } from '@/shared/types/interfaces';
+import { Question } from '@/entity/question';
+import { Answer } from '@/entity/answer';
 
 export const useSurvey = (surveyTitle: string) => {
   const { data, isLoading, error } = useGetQuestions(surveyTitle);

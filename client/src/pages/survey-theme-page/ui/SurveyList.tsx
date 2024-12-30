@@ -1,19 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useToggleSurveyVisibilityMutation } from '@/shared/http';
-
-export interface Survey {
-  id: number;
-  title: string;
-  isCompleted: boolean;
-  hidden: boolean;
-}
+import { Survey } from '@/entity/survey';
 
 export interface SurveyListProps {
   surveys: Survey[];
   themeTitle: string;
   isAdmin: boolean;
 }
+
 const SurveyList: React.FC<SurveyListProps> = ({
   surveys,
   themeTitle,
@@ -23,29 +18,36 @@ const SurveyList: React.FC<SurveyListProps> = ({
     useToggleSurveyVisibilityMutation();
 
   type VisibilityState = {
-    [key: number]: boolean;
+    [key: string]: boolean;
   };
 
-  const initialVisibility = Array.isArray(surveys)
-    ? surveys.reduce((acc, survey) => {
-        acc[survey.id] = !survey.hidden;
-
-        return acc;
-      }, {} as VisibilityState)
-    : {};
-
-  const [surveyVisibility, setSurveyVisibility] =
-    useState<VisibilityState>(initialVisibility);
+  const [surveyVisibility, setSurveyVisibility] = useState<VisibilityState>({});
   const [showCompleted, setShowCompleted] = useState(true);
+
+  useEffect(() => {
+    const initialVisibility = surveys.reduce((acc, survey) => {
+      acc[survey.title] = !survey.hidden;
+      return acc;
+    }, {} as VisibilityState);
+    setSurveyVisibility(initialVisibility);
+  }, [surveys]);
 
   if (!Array.isArray(surveys) || surveys.length === 0) {
     return <div className="text-center text-gray-600">No surveys</div>;
   }
 
-  const handleToggleVisibility = (surveyId: number) => {
-    const newVisibility = !surveyVisibility[surveyId];
-    toggleSurveyVisibility({ surveyId });
-    setSurveyVisibility((prev) => ({ ...prev, [surveyId]: newVisibility }));
+  const handleToggleVisibility = async (surveyTitle: string) => {
+    const newVisibility = !surveyVisibility[surveyTitle];
+
+    try {
+      await toggleSurveyVisibility({ surveyTitle, themeTitle });
+      setSurveyVisibility((prev) => ({
+        ...prev,
+        [surveyTitle]: newVisibility,
+      }));
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+    }
   };
 
   const handleToggleShowCompleted = () => {
@@ -85,7 +87,7 @@ const SurveyList: React.FC<SurveyListProps> = ({
 
           return (
             <div
-              key={survey.id}
+              key={survey.title}
               className="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-8 shadow-lg transition-transform transform hover:scale-105 flex flex-col items-center relative"
             >
               <Link
@@ -103,20 +105,22 @@ const SurveyList: React.FC<SurveyListProps> = ({
                     <span className="relative">
                       <input
                         type="checkbox"
-                        checked={surveyVisibility[survey.id] || false}
-                        onChange={() => handleToggleVisibility(survey.id)}
+                        checked={surveyVisibility[survey.title] || false}
+                        onChange={() => handleToggleVisibility(survey.title)}
                         className="absolute opacity-0 peer"
                       />
                       <div
                         className={`block w-12 h-6 rounded-full transition-all duration-300 ${
-                          surveyVisibility[survey.id]
+                          surveyVisibility[survey.title]
                             ? 'bg-purple-600'
                             : 'bg-gray-300'
                         }`}
                       >
                         <div
                           className={`dot absolute left-0 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${
-                            surveyVisibility[survey.id] ? 'translate-x-6' : ''
+                            surveyVisibility[survey.title]
+                              ? 'translate-x-6'
+                              : ''
                           }`}
                         ></div>
                       </div>

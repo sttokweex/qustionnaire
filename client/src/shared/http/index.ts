@@ -6,18 +6,23 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import axios from 'axios';
-import {
-  AuthResponse,
-  LoginData,
-  Question,
-  Survey,
-  SurveyResponse,
-  SurveyTheme,
-} from '../types/interfaces';
+import { LoginData } from '../types/interfaces';
 import axiosInstance from '@/api/axiosInstance';
+import { API_URL } from '../constants/config';
+import { Answer } from '@/entity/answer';
+import { Question } from '@/entity/question';
+import { Survey } from '@/entity/survey';
+import { SurveyTheme } from '@/entity/surveyTheme';
 
-const API_URL: string = import.meta.env.VITE_DEV_PORT || '';
-
+export interface AuthResponse {
+  accessToken: string;
+  expirationTime: number;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+  };
+}
 const refreshToken = async (): Promise<AuthResponse> => {
   try {
     const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {
@@ -183,12 +188,12 @@ const useAddSurveyThemeMutation = (): UseMutationResult<
     },
   });
 };
-
+type QuestionWithoutId = Omit<Question, 'id'>;
 const useAddSurveyMutation = (): UseMutationResult<
   Survey,
   unknown,
   {
-    survey: { title: string; questions: Question[] };
+    survey: { title: string; questions: QuestionWithoutId[] };
     themeTitle: string;
     flag: boolean;
   }
@@ -199,7 +204,7 @@ const useAddSurveyMutation = (): UseMutationResult<
     Survey,
     unknown,
     {
-      survey: { title: string; questions: Question[] };
+      survey: { title: string; questions: QuestionWithoutId[] };
       themeTitle: string;
       flag: boolean;
     }
@@ -217,7 +222,11 @@ const useAddSurveyMutation = (): UseMutationResult<
     },
   });
 };
-
+export interface SurveyResponse {
+  survey: Survey;
+  questions: Question[];
+  answers: Answer[];
+}
 const useGetQuestions = (
   title: string,
 ): UseQueryResult<SurveyResponse, Error> => {
@@ -268,9 +277,13 @@ const useSubmitSurveyMutation = (): UseMutationResult<
 const useToggleSurveyVisibilityMutation = (): UseMutationResult<
   { hidden: boolean },
   unknown,
-  { surveyId: number }
+  { surveyTitle: string; themeTitle: string }
 > => {
-  return useMutation<{ hidden: boolean }, unknown, { surveyId: number }>({
+  return useMutation<
+    { hidden: boolean },
+    unknown,
+    { surveyTitle: string; themeTitle: string }
+  >({
     mutationFn: async (data) => {
       const res = await axiosInstance.post<{ hidden: boolean }>(
         '/toggleVisible',

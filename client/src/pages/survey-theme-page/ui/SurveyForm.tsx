@@ -1,8 +1,19 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SurveyFormData } from './interfaces';
+
+export interface QuestionWithoutId {
+  questionText: string;
+  answerOptions: string;
+  answerType: 'single' | 'multiple' | 'open';
+}
+
+export interface SurveyFormData {
+  title: string;
+  flag: 'private' | 'public';
+  questions: QuestionWithoutId[];
+}
 
 const SurveyForm: React.FC<{
   onSubmit: (data: SurveyFormData) => Promise<void>;
@@ -150,14 +161,6 @@ const SurveyForm: React.FC<{
           Create Survey
         </button>
       </form>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        draggable
-        pauseOnHover
-      />
     </div>
   );
 };

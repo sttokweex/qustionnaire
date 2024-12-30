@@ -1,5 +1,7 @@
 import React from 'react';
-import { Answer, Question } from '@/shared/types/interfaces';
+
+import { Answer } from '@/entity/answer';
+import { Question } from '@/entity/question';
 
 export interface QuestionProps {
   question: Question;

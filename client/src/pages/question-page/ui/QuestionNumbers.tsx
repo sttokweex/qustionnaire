@@ -1,7 +1,8 @@
+import { Question } from '@/entity/question';
 import React from 'react';
 
 export interface QuestionNumbersProps {
-  questions: any[];
+  questions: Question[];
   currentQuestionIndex: number;
   onClick: (index: number) => void;
 }
